@@ -2,41 +2,110 @@
 #define __VECTOR_H__
 
 #include <functional>
+#include <vector>
+#include <mutex>
 
 template <class T>
-class Vector {
+class Vector : public std::vector<T>{
   public:
     Vector() {}                                             //Constructor
     ~Vector() {}                                            //Destructor
 
-    T& push_back(const T& v) {}	                            //Add element at the end
-    T& push_back(T&& v) {}
+    //Add element at the end
+    void push_back(const T& v) {
+        std::lock_guard<std::mutex> guard(_mutex);
+        std::vector<T>::push_back(v);
+    }	                            
+    void push_back(T&& v) {
+        std::lock_guard<std::mutex> guard(_mutex);
+        std::vector<T>::push_back(v);
+    }
+    //Construct and insert element
+    T& emplace_back(T&& v) {
+        std::lock_guard<std::mutex> guard(_mutex);
+        return std::vector<T>::emplace_back(v);
+    }
+    //Clean the vector
+    void clear() {
+        std::lock_guard<std::mutex> guard(_mutex);
+        std::vector<T>::clear();
+    }
+    //Resize the vector     	                        
+    void resize(size_t n) {
+        std::lock_guard<std::mutex> guard(_mutex);
+        std::vector<T>::resize(n);
+    }      	  
+    //Reserve elements
+    void reserve(size_t n) {
+        std::lock_guard<std::mutex> guard(_mutex);
+        std::vector<T>::reserve(n);
+    }  	                            
 
-    T& emplace_back(T&& v) {}                               //Construct and insert element
-
-    void clear() {}                	                        //Clean the vector
-    void resize(size_t n) {}      	                        //Resize the vector
-    void reserve(size_t n) {}  	                            //Reserve elements
-
+    //Erase the last element
     void erase(std::size_t first, std::size_t last) {}	    //Erase elements in a range
-    T pop_back() {}    	                                    //Erase the last element
+    T pop_back() {
+        std::lock_guard<std::mutex> guard(_mutex);
+        return std::vector<T>::pop_back(v);
+    }    	                                    
+    //Size of vector
+    size_t size() {
+        std::lock_guard<std::mutex> guard(_mutex);
+        return std::vector<T>::size();
+    }     	      
+    //Capacity of the vector
+    size_t capacity() {
+        std::lock_guard<std::mutex> guard(_mutex);
+        return std::vector<T>::capacity();
+    }	                                
+    //Verifies if the vector is empty
+    bool empty() {
+        std::lock_guard<std::mutex> guard(_mutex);
+        return std::vector<T>::empty();
+    }    	             
 
-    size_t size() {}     	                                //Size of vector
-    size_t capacity() {}	                                //Capacity of the vector
-    bool empty() {}    	                                    //Verifies if the vector is empty
+    //Access to an element
+    T& operator[](size_t idx) {
+        std::lock_guard<std::mutex> guard(_mutex);
+        return std::vector[idx];
+    }        	                
 
-    T& operator[](size_t idx) {}        	                //Access to an element
-    const T& operator[](size_t idx) const {}
+    const T& operator[](size_t idx) const {
+        std::lock_guard<std::mutex> guard(_mutex);
+        return std::vector[idx];
+    }
 
-    T& back() {}          	                                //Access to the last element
-    const T& back() const {}
+    //Access to the last element
+    T& back() {
+        std::lock_guard<std::mutex> guard(_mutex);
+        return std::vector<T>::back(v);
+    }          	                               
+    const T& back() const {
+        std::lock_guard<std::mutex> guard(_mutex);
+        return std::vector<T>::back(v);
+    }
 
-    void foreach(std::function<void(const T&)> f) const {}  //Loops through the vector and executes the function for each element
-    void foreach(std::function<void(T&)> f) {}
-
-    void swapElement(size_t pos, T* other) {}          	    //Swaps an element of the vector
-    void swap(Vector& other) {}                             //Swaps the whole vector
+    //Loops through the vector and executes the function for each element
+    void foreach(std::function<void(const T&)> f) const {
+        std::lock_guard<std::mutex> guard(_mutex);
+        std::vector<T>::foreach(f);
+    }  
+    void foreach(std::function<void(T&)> f) {
+        std::lock_guard<std::mutex> guard(_mutex);
+        std::vector<T>::foreach(f);    
+    }
+    //Swaps an element of the vector
+    void swapElement(size_t pos, T* other) {
+        std::lock_guard<std::mutex> guard(_mutex);
+        std::vector<T>::swapElement(pos, other);
+    }          	    
+    //Swaps the whole vector
+    void swap(Vector& other) {
+        std::lock_guard<std::mutex> guard(_mutex);
+        std::vector<T>::swap(other);
+    }
   private:
+      std::mutex _mutex;
+
 };
 
 #endif
