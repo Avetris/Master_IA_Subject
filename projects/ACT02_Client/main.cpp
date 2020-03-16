@@ -33,13 +33,14 @@ void printOptions() {
 }
 
 std::string checkInput(bool randomInteraction) {
-    std::string input;
-    std::cin >> input;
     std::string selectedOption;
     if (randomInteraction) {
+        srand(time(NULL));
         selectedOption = options.at(rand() % options.size());
     }
     else {
+        std::string input;
+        std::cin >> input;
         if (input == "exit") {
             selectedOption = "exit";
         }
@@ -113,10 +114,11 @@ int checkResponse(int* result, std::string response) {
                 printStageResult(val);
                 break;
             case 2:
+            {
                 std::string res = "";
                 uint8_t resPos = 0;
                 uint8_t resWordPos = 0;
-                for (char v : val ) {
+                for (char v : val) {
                     if (v == '/' || resWordPos == val.size() - 1) {
                         if (resWordPos == val.size() - 1) {
                             res += v;
@@ -132,6 +134,20 @@ int checkResponse(int* result, std::string response) {
                 }
                 break;
             }
+            case 3:
+                if (result[0] > result[1]) {
+                    std::cout << "You have won the match" << std::endl;
+                }
+                else if (result[0] < result[1]) {
+                    std::cout << "You have lost the match" << std::endl;
+                }
+                else {
+                    std::cout << "There has been a drawn in the match" << std::endl;
+                }
+                stage = -1;
+                break;
+            }
+
             part++;
             val = "";
         }
@@ -147,6 +163,20 @@ int main() {
     SocketUtils::init();
 
     {
+        std::string response;
+
+        int stage = 0;
+        int result[2] = { 0 };
+
+        std::cout << "Do you want to play? (In caso of saying no, there will be a match between machines)" << std::endl;
+        std::string res ;
+        while (!res._Equal("yes") && !res._Equal("no")) {
+            std::cout << "(yes/no)";
+            std::cin >> res;
+        }
+        bool randomInteraction = res._Equal("no");
+
+
         TCPSocketPtr socket = SocketUtils::createTCPSocket(SocketUtils::INET);
 
         SocketAddressPtr address = SocketUtils::createIPv4FromString("127.0.0.1:9090");
@@ -155,19 +185,6 @@ int main() {
 
         constexpr size_t bufferLength = 255;
         char buffer[bufferLength];
-
-        std::string response;
-
-        int stage = 0;
-        int result[2] = { 0 };
-
-        std::cout << "Do you want to play? (In caso of saying no, there will be a match between machines)" << std::endl;
-        std::string res;
-        while (res._Equal("yes") && !res._Equal("no")) {
-            std::cout << "(yes/no)";
-            std::cin >> res;
-        }
-        bool randomInteraction = res._Equal("no");
 
         while (!response._Equal("end")) {
             if (options.size() == 0) {
@@ -198,6 +215,10 @@ int main() {
 
             if (!response._Equal("end")) {
                 stage = checkResponse(result, response);
+
+                if (stage < 0) {
+                    break;
+                }
             }
 
             //std::this_thread::sleep_for(std::chrono::milliseconds(10000));
