@@ -186,11 +186,11 @@ int main() {
         constexpr size_t bufferLength = 255;
         char buffer[bufferLength];
 
-        while (!response._Equal("end")) {
+        while (!response._Equal("end") && (result[0] >= 0 || result[1] >= 0)) {
             if (options.size() == 0) {
                 sprintf(buffer, "start");
-                socket->sendTo(buffer, std::string(buffer).size() + 1);
-                socket->receiveFrom(buffer, bufferLength);
+                result[0] = socket->sendTo(buffer, std::string(buffer).size() + 1);
+                result[1] = socket->receiveFrom(buffer, bufferLength);
 
                 getOptions(std::string(buffer));
 
@@ -207,9 +207,9 @@ int main() {
             selectedOption = checkInput(randomInteraction);
 
             sprintf(buffer, selectedOption.c_str());
-            socket->sendTo(buffer, std::string(buffer).size() + 1);
+            result[0] = socket->sendTo(buffer, std::string(buffer).size() + 1);
 
-            socket->receiveFrom(buffer, bufferLength);
+            result[1] = socket->receiveFrom(buffer, bufferLength);
             
             response = std::string(buffer);
 

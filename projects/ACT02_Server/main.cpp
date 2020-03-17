@@ -9,6 +9,7 @@
 const std::vector<std::string> options = {
     "Rock", "Paper", "Scissors", "Lizard", "Spock"
 };
+const int NUMBER_OF_GAMES = 20;
 class Game {
 public:
     Game(TCPSocketPtr connSocket) {
@@ -47,8 +48,8 @@ public:
                 std::string result = options.at(rand() % options.size());
                 int winner = chooseWinner(std::string(buffer), result);
                 _stage++;
-                if (winner != 0)
-                    _result[winner == -1 ? 1 : 0] += 1;
+                if (winner != RESULT::DRAW)
+                    _result[winner == RESULT::LOSE ? 1 : 0] += 1;
                 sprintf(buffer, generateResponse(winner, response, result).c_str());
             }
             _error[1] = _connSocket->sendTo(buffer, std::string(buffer).size() + 1);
@@ -164,7 +165,7 @@ public:
             returnResult += std::to_string(_result[0]) + "/";
             returnResult += std::to_string(_result[1]);
 
-            if (_stage == 20) {
+            if (_stage > NUMBER_OF_GAMES) {
                 returnResult += ";end";
             }
             return returnResult;
