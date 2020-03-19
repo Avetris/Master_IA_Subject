@@ -10,7 +10,7 @@ std::vector<std::string> options;
 int result[2] = { 0 };
 
 void printOptions() {
-    std::cout << "Select an option (write 'exit' to end): " << std::endl;
+    std::cout << "Select an option: " << std::endl;
     for (int i = 0; i < options.size(); i++) {
         std::cout << i << " - " << options.at(i) << std::endl;
     }
@@ -24,9 +24,6 @@ std::string checkInput(bool randomInteraction) {
     else {
         std::string input;
         std::cin >> input;
-        if (input == "exit") {
-            selectedOption = COMUNICATION_COMMAND::FINISH;
-        }
         for (int i = 0; i < options.size() && selectedOption.empty(); i++) {
             if (input == std::to_string(i) || input == options.at(i)) {
                 selectedOption = options.at(i);

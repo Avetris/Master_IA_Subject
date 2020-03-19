@@ -26,10 +26,7 @@ public:
 
             std::pair<COMUNICATION_COMMAND, std::string> response = Command::getCommand(std::string(buffer));
 
-            if (response.first == COMUNICATION_COMMAND::FINISH) {
-                std::cout << "Exiting = " << buffer << std::endl;
-                break;
-            }else if (response.first == COMUNICATION_COMMAND::START) {
+            if (response.first == COMUNICATION_COMMAND::START) {
                 sendOptions(buffer);
             }
             else {
