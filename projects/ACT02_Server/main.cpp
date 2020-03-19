@@ -1,4 +1,5 @@
 #include "net/socketutils.h"
+#include "net/commands.h"
 #include "net/socketaddress.h"
 #include <string>
 #include <thread>
@@ -23,25 +24,13 @@ public:
             _error[0] = _connSocket->receiveFrom(buffer, bufferLength);
             std::cout << "Received = " << buffer << std::endl;
 
-            if (std::string(buffer) == "exit") {
+            std::pair<COMUNICATION_COMMAND, std::string> response = Command::getCommand(std::string(buffer));
+
+            if (response.first == COMUNICATION_COMMAND::FINISH) {
                 std::cout << "Exiting = " << buffer << std::endl;
                 break;
-            }
-
-            std::string response = std::string(buffer);
-
-            if (response._Equal("start")) {
-                std::string optionsSring = "";
-                for (std::string op : options) {
-                    if (!optionsSring.empty()) {
-                        optionsSring += ";";
-                    }
-                    optionsSring += op;
-                }
-                sprintf(buffer, optionsSring.c_str());
-            }
-            else if (response._Equal("exit")) {
-                sprintf(buffer, "end");
+            }else if (response.first == COMUNICATION_COMMAND::START) {
+                sendOptions(buffer);
             }
             else {
                 srand(time(NULL));
@@ -50,23 +39,29 @@ public:
                 _stage++;
                 if (winner != RESULT::DRAW)
                     _result[winner == RESULT::LOSE ? 1 : 0] += 1;
-                sprintf(buffer, generateResponse(winner, response, result).c_str());
-            }
-            _error[1] = _connSocket->sendTo(buffer, std::string(buffer).size() + 1);
-
-            if (response._Equal("exit")) {
-                disconnect(false);
-                break;
+                generateResponse(buffer, winner, response.second, result);
+                if (_stage >= NUMBER_OF_GAMES) {
+                    break;
+                }
             }
 
             std::this_thread::sleep_for(std::chrono::milliseconds(1000));
 
             if (_error[0] < 0 && _error[1] < 0) {
                 std::cout << "Client Disconnected" << std::endl;
-                disconnect(false);
                 break;
             }
         }
+        int res = 0;
+        if (_result[0] > _result[1]) {
+            res = 1;
+        }
+        else if (_result[0] < _result[1]) {
+            res = -1;
+        }
+        createResponse(buffer, COMUNICATION_COMMAND::FINISH, std::to_string(res));
+        _connSocket.release();
+        delete this;
     }
 
     private:
@@ -79,6 +74,13 @@ public:
         int _stage = 0;
         int _result[2] = { 0 };
         int _error[2] = { 0 };
+        void sendOptions(char* buffer) {
+            for (std::string op : options) {
+                createResponse(buffer, COMUNICATION_COMMAND::OPTIONS, op);
+            }
+            generateResponse(buffer, 0, "", "", true);
+        }
+
         int chooseWinner(std::string player, std::string decission) {
             int result = RESULT::DRAW;
             if (player._Equal(decission)) {
@@ -156,31 +158,24 @@ public:
             }
             return result;
         }
-
-        std::string generateResponse(int result, std::string player, std::string decission) {
-            std::string returnResult = std::to_string(_stage) + ";";
-            returnResult += std::to_string(result) + "/";
-            returnResult += player + "/";
-            returnResult += decission + ";";
-            returnResult += std::to_string(_result[0]) + "/";
-            returnResult += std::to_string(_result[1]);
-
-            if (_stage > NUMBER_OF_GAMES) {
-                returnResult += ";end";
-            }
-            return returnResult;
+        
+        void createResponse(char* buffer, COMUNICATION_COMMAND command, std::string message) {
+            sprintf(buffer, Command::setCommand(command, message).c_str());
+            _error[1] = _connSocket->sendTo(buffer, std::string(buffer).size() + 1);
+            std::this_thread::sleep_for(std::chrono::milliseconds(100));
         }
 
-        void disconnect(bool sayToClient) {
-            if (sayToClient) {
-                constexpr size_t bufferLength = 255;
-                char buffer[bufferLength];
-
-                sprintf(buffer, "end");
-
-                _connSocket->sendTo(buffer, std::string(buffer).size() + 1);
+        void generateResponse(char* buffer, int winner, std::string player, std::string decission, bool firstStage = false) {
+            createResponse(buffer, COMUNICATION_COMMAND::STAGE, std::to_string(_stage));
+            if (!firstStage) {
+                createResponse(buffer, COMUNICATION_COMMAND::WINNER, std::to_string(winner));
+                createResponse(buffer, COMUNICATION_COMMAND::SELECTION, player + " - " + decission);
             }
-            delete this;
+            createResponse(buffer, COMUNICATION_COMMAND::RESULT, std::to_string(_result[0]) + "-" + std::to_string(_result[1]));
+
+            if (_stage < NUMBER_OF_GAMES) {
+                createResponse(buffer, COMUNICATION_COMMAND::NEXT_STAGE, "");
+            }
         }
 };
 
@@ -188,6 +183,7 @@ int main() {
     SocketUtils::init();
 
     {
+        srand(time(NULL));
         TCPSocketPtr socket = SocketUtils::createTCPSocket(SocketUtils::INET);
 
         SocketAddressPtr address = SocketUtils::createIPv4FromString("127.0.0.1:9090");

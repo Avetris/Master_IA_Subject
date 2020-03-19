@@ -16,6 +16,7 @@ set(NET_SRC_FILES
     ${CMAKE_CURRENT_LIST_DIR}/src/net/udpsocket.cpp)
 
 set(NET_HEADER_FILES
+    ${CMAKE_CURRENT_LIST_DIR}/include/net/commands.h
     ${CMAKE_CURRENT_LIST_DIR}/include/net/socketaddress.h
     ${CMAKE_CURRENT_LIST_DIR}/include/net/socketutils.h
     ${CMAKE_CURRENT_LIST_DIR}/include/net/tcpsocket.h

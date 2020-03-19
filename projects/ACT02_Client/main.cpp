@@ -1,29 +1,13 @@
 #include "net/socketutils.h"
 #include "net/socketaddress.h"
+#include "net/commands.h"
 #include <thread>
 #include <vector>
 #include <string>
 
+
 std::vector<std::string> options;
-
-
-void getOptions(std::string response) {
-    std::string opt = "";
-    uint8_t wordPos = 0;
-    for (char c : response) {
-        if (c == ';' || wordPos == response.size() - 1) {
-            if (wordPos == response.size() - 1) {
-                opt += c;
-            }
-            options.push_back(opt);
-            opt = "";
-        }
-        else {
-            opt += c;
-        }
-        wordPos++;
-    }
-}
+int result[2] = { 0 };
 
 void printOptions() {
     std::cout << "Select an option (write 'exit' to end): " << std::endl;
@@ -35,14 +19,13 @@ void printOptions() {
 std::string checkInput(bool randomInteraction) {
     std::string selectedOption;
     if (randomInteraction) {
-        srand(time(NULL));
         selectedOption = options.at(rand() % options.size());
     }
     else {
         std::string input;
         std::cin >> input;
         if (input == "exit") {
-            selectedOption = "exit";
+            selectedOption = COMUNICATION_COMMAND::FINISH;
         }
         for (int i = 0; i < options.size() && selectedOption.empty(); i++) {
             if (input == std::to_string(i) || input == options.at(i)) {
@@ -58,115 +41,61 @@ std::string checkInput(bool randomInteraction) {
     return selectedOption;
 }
 
-void printStageResult(std::string value) {
-    std::string word;
-    uint8_t pos = 0;
-    uint8_t wordPos = 0;
-    for (char c : value) {
-        if (c == '/' || wordPos == value.size() - 1) {
-            if (wordPos == value.size() - 1) {
+void checkResponse(std::pair<COMUNICATION_COMMAND, std::string> response) {
+    switch (response.first)
+    {
+    case OPTIONS:
+        options.push_back(response.second);
+        break;
+    case SELECTION:
+    {
+        std::string word = "";
+        for (char c : response.second) {
+            if (c == '-') {
+                std::cout << "You: " << word << std::endl;
+                word = "";
+            }
+            else {
                 word += c;
             }
-            if (pos == 0) {
-                if (std::atoi(word.c_str()) == 1) {
-                    std::cout << "You have won the stage!" << std::endl;
-                }
-                else if (std::atoi(word.c_str()) == -1) {
-                    std::cout << "You have lost the stage!" << std::endl;
-                }
-                else {
-                    std::cout << "There has been a draw in the stage!" << std::endl;
-                }
-            }
-            else if (pos == 1) {
-                std::cout << "You: " << word << std::endl;
-            }
-            else if (pos == 2) {
-                std::cout << "Other: " << word << std::endl;
-            }
-            pos++;
-            word = "";
+        }
+        std::cout << "Other: " << word << std::endl;
+        break;
+
+    }
+    case STAGE:
+    {
+        std::cout << "Stage: " << response.second << std::endl;
+    }
+        break;
+    case WINNER:
+    {
+        int res = std::atoi(response.second.c_str());
+        if (res == 1) {
+            std::cout << "You have won the stage!" << std::endl;
+        }
+        else if (res == -1) {
+            std::cout << "You have lost the stage!" << std::endl;
         }
         else {
-            word += c;
+            std::cout << "There has been a draw in the stage!" << std::endl;
         }
-        wordPos++;
     }
-    std::cout << std::endl << "------------------------------" << std::endl << std::endl;
-}
-
-int checkResponse(int* result, std::string response) {
-    std::string val = "";
-    uint8_t part = 0;
-    uint8_t wordPos = 0;
-    int stage = 0;
-    for (char c : response) {
-        if (c == ';' || wordPos == response.size() - 1) {
-            if (wordPos == response.size() - 1) {
-                val += c;
-            }
-            switch (part)
-            {
-            case 0:
-                stage = std::atoi(val.c_str());
-                break;
-            case 1:
-                printStageResult(val);
-                break;
-            case 2:
-            {
-                std::string res = "";
-                uint8_t resPos = 0;
-                uint8_t resWordPos = 0;
-                for (char v : val) {
-                    if (v == '/' || resWordPos == val.size() - 1) {
-                        if (resWordPos == val.size() - 1) {
-                            res += v;
-                        }
-                        result[resPos] = std::atoi(res.c_str());
-                        resPos++;
-                        res = "";
-                    }
-                    else {
-                        res += v;
-                    }
-                    resWordPos++;
-                }
-                break;
-            }
-            case 3:
-                if (result[0] > result[1]) {
-                    std::cout << "You have won the match" << std::endl;
-                }
-                else if (result[0] < result[1]) {
-                    std::cout << "You have lost the match" << std::endl;
-                }
-                else {
-                    std::cout << "There has been a drawn in the match" << std::endl;
-                }
-                stage = -1;
-                break;
-            }
-
-            part++;
-            val = "";
-        }
-        else {
-            val += c;
-        }
-        wordPos++;
+        break;
+    case RESULT:
+    {
+        std::cout << "Current Result: " << response.second.c_str() << std::endl;
     }
-    return stage;
+        break;
+    }
 }
 
 int main() {
     SocketUtils::init();
 
     {
+        srand(time(NULL));
         std::string response;
-
-        int stage = 0;
-        int result[2] = { 0 };
 
         std::cout << "Do you want to play? (In caso of saying no, there will be a match between machines)" << std::endl;
         std::string res ;
@@ -185,43 +114,68 @@ int main() {
 
         constexpr size_t bufferLength = 255;
         char buffer[bufferLength];
+        COMUNICATION_COMMAND command = COMUNICATION_COMMAND::NONE;
 
-        while (!response._Equal("end") && (result[0] >= 0 || result[1] >= 0)) {
-            if (options.size() == 0) {
-                sprintf(buffer, "start");
+        while (command != COMUNICATION_COMMAND::FINISH && result[0] >= 0 && result[1] >= 0) {
+
+            if (options.size() == 0 && command != COMUNICATION_COMMAND::OPTIONS) {
+                sprintf(buffer, Command::setCommand(COMUNICATION_COMMAND::START, "").c_str());
                 result[0] = socket->sendTo(buffer, std::string(buffer).size() + 1);
-                result[1] = socket->receiveFrom(buffer, bufferLength);
-
-                getOptions(std::string(buffer));
 
                 std::cout << "Starting the Game" << std::endl;
             }
-
-            std::cout << "Stage: " << stage << " - Result: " << result[0] << " - " << result[1] << std::endl;
-
-
-            std::string selectedOption;
-            if (!randomInteraction) {
-                printOptions();
-            }
-            selectedOption = checkInput(randomInteraction);
-
-            sprintf(buffer, selectedOption.c_str());
-            result[0] = socket->sendTo(buffer, std::string(buffer).size() + 1);
-
             result[1] = socket->receiveFrom(buffer, bufferLength);
-            
-            response = std::string(buffer);
 
-            if (!response._Equal("end")) {
-                stage = checkResponse(result, response);
+            std::string response = std::string(buffer);
 
-                if (stage < 0) {
+            std::pair<COMUNICATION_COMMAND, std::string> current_command = Command::getCommand(response);
+
+            if (!current_command.second.empty() && current_command.first != COMUNICATION_COMMAND::FINISH) {
+                checkResponse(current_command);            }
+            else {
+                bool finish = false;
+
+                switch (current_command.first)
+                {
+                    case NEXT_STAGE:
+                    {
+                        std::cout << std::endl << "------------------------------" << std::endl << std::endl;
+
+                        if (!randomInteraction) {
+                            printOptions();
+                        }
+                        sprintf(buffer, checkInput(randomInteraction).c_str());
+                        result[0] = socket->sendTo(buffer, std::string(buffer).size() + 1);
+                        command = COMUNICATION_COMMAND::NONE;
+                        break;
+                    }
+                    case FINISH:
+                    {
+                        command = current_command.first;
+                        std::cout << std::endl << "The match has finished!" << std::endl;
+                        int res = std::atoi(current_command.second.c_str());
+                        if (res > 0) {
+                            std::cout << "You have won the match!" << std::endl;
+                        }
+                        else if (res < 0) {
+                            std::cout << "You have lost the match!" << std::endl;
+                        }
+                        else {
+                            std::cout << "There has been a drawn in the match!" << std::endl;
+                        }
+                        finish = true;
+                        break;
+                    }
+                    default:
+                    {
+                        command = current_command.first;
+                        break;
+                    }
+                }
+                if (finish) {
                     break;
                 }
             }
-
-            //std::this_thread::sleep_for(std::chrono::milliseconds(10000));
         }
     }
 
