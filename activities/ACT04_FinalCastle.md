@@ -1,4 +1,4 @@
-# Actividad Opcional 04 - IA, Final Castle
+# Actividad 04 - IA, Final Castle
 
 ## Fecha Entrega, Conv1 = 12/04/20, Conv2 = 24/04/20
 
