@@ -63,6 +63,21 @@ void DebugDraw::renderPositionHist() {
   }
 }
 
+void DebugDraw::drawPath(std::vector<t_coord> path)
+{
+    const int numRect = path.size();
+    //SDL_Rect* rect = new SDL_Rect[numRect];
+    SDL_Renderer* renderer = Window::instance().getRenderer();
+    SDL_Rect rect;
+    for (size_t i = 0; i < numRect; i++) {
+        rect.x = path[i].x * 8;
+        rect.y = path[i].y * 8;
+        rect.w = 8;
+        rect.h = 8;
+        SDL_RenderFillRect(renderer, &rect);
+    }
+}
+
 void DebugDraw::drawVector(const Vec2& pos, const Vec2& v,
   const uint8_t r, const uint8_t g, const uint8_t b, const uint8_t a) {
   Command com;

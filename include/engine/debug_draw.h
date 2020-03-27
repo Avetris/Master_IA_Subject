@@ -12,6 +12,7 @@
 using MathLib::Vec2;
 
 #include <vector>
+#include <ia\defines.h>
 
 class DebugDraw {
   public:
@@ -27,12 +28,14 @@ class DebugDraw {
     static void drawPositionHist(const Vec2& pos);
 
     static void toggleEnabled() { enabled_ = !enabled_; };
+    static void drawPath(std::vector<t_coord> path);
   private:
     static void renderVector(const Vec2& pos, const Vec2& v,
       uint8_t r, uint8_t g, uint8_t b, uint8_t a);
     static void renderCross(const Vec2& pos,
       uint8_t r, uint8_t g, uint8_t b, uint8_t a);
     static void renderPositionHist();
+
 
     static bool enabled_;
     static float delta_;

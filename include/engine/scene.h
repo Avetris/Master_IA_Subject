@@ -17,7 +17,7 @@ class Scene {
   public:
     virtual ~Scene() {};
 
-    virtual void init(World* world) = 0;
+    virtual void init() = 0;
     virtual void shutdown() = 0;
 
     virtual void update(uint32_t dt) = 0;
@@ -26,8 +26,6 @@ class Scene {
     virtual void render() = 0;
   protected:
     Scene() {};
-
-    World* world_ = nullptr;
 };
 
 #endif

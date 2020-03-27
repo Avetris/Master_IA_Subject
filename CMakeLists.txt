@@ -41,6 +41,7 @@ set(ENGINE_SRC_FILES
   ${CMAKE_CURRENT_LIST_DIR}/src/engine/game.cc
   ${CMAKE_CURRENT_LIST_DIR}/src/engine/sprite.cc
   ${CMAKE_CURRENT_LIST_DIR}/src/engine/texture.cc
+  ${CMAKE_CURRENT_LIST_DIR}/src/engine/ui_manager.cc
   ${CMAKE_CURRENT_LIST_DIR}/src/engine/window.cc)
 
 set(ENGINE_HEADER_FILES
@@ -50,13 +51,17 @@ set(ENGINE_HEADER_FILES
   ${CMAKE_CURRENT_LIST_DIR}/include/engine/scene.h
   ${CMAKE_CURRENT_LIST_DIR}/include/engine/sprite.h
   ${CMAKE_CURRENT_LIST_DIR}/include/engine/texture.h
+  ${CMAKE_CURRENT_LIST_DIR}/include/engine/ui_manager.h
   ${CMAKE_CURRENT_LIST_DIR}/include/engine/window.h)
 
 set(IA_SRC_FILES
   ${CMAKE_CURRENT_LIST_DIR}/src/ia/agent.cc
   ${CMAKE_CURRENT_LIST_DIR}/src/ia/body.cc
   ${CMAKE_CURRENT_LIST_DIR}/src/ia/mind.cc
-  ${CMAKE_CURRENT_LIST_DIR}/src/ia/scene_steering.cc)
+  ${CMAKE_CURRENT_LIST_DIR}/src/ia/path_finding/path_finding.cc
+  ${CMAKE_CURRENT_LIST_DIR}/src/ia/path_finding/path_manager.cc
+  ${CMAKE_CURRENT_LIST_DIR}/src/ia/scene_steering.cc
+  ${CMAKE_CURRENT_LIST_DIR}/src/ia/scene_path.cc)
 
 set(IA_HEADER_FILES
   ${CMAKE_CURRENT_LIST_DIR}/include/ia/agent.h
@@ -64,7 +69,10 @@ set(IA_HEADER_FILES
   ${CMAKE_CURRENT_LIST_DIR}/include/ia/defines.h
   ${CMAKE_CURRENT_LIST_DIR}/include/ia/map.h
   ${CMAKE_CURRENT_LIST_DIR}/include/ia/mind.h
+  ${CMAKE_CURRENT_LIST_DIR}/include/ia/path_finding/path_finding.h
+  ${CMAKE_CURRENT_LIST_DIR}/include/ia/path_finding/path_manager.h
   ${CMAKE_CURRENT_LIST_DIR}/include/ia/scene_steering.h
+  ${CMAKE_CURRENT_LIST_DIR}/include/ia/scene_path.h
   ${CMAKE_CURRENT_LIST_DIR}/include/ia/world.h
   ${CMAKE_CURRENT_LIST_DIR}/include/ia/movement/kinematic/kinematicarrive.h
   ${CMAKE_CURRENT_LIST_DIR}/include/ia/movement/kinematic/kinematicflee.h

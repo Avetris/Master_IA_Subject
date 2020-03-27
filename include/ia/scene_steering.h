@@ -16,13 +16,18 @@ class SceneSteering: public Scene {
     SceneSteering() {};
     ~SceneSteering() {};
 
-    void init(World* world) final;
+    void init() final;
     void shutdown() final;
 
     void update(uint32_t dt) final;
     void handleMouseEvent(SDL_Event e) final;
     void handleKeyEvent(SDL_Keycode key) final;
     void render() final;
+
+  private:
+      World world_;
+
+      int8_t slo_mo_ = 1;
 };
 
 #endif

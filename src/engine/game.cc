@@ -10,19 +10,19 @@
 #include "engine/window.h"
 #include "ia/defines.h"
 #include "ia/scene_steering.h"
+#include <engine\ui_manager.h>
 
 #include <cstdio>
 
-void Game::init() {
-  font_ = TTF_OpenFont(FONT_FILE, FPS_FONT_SIZE);
-  if (!font_) {
-    printf("Failed to load font! SDL_ttf Error: %s\n", TTF_GetError());
-  }
+Game::~Game()
+{
+    UIManager::instance().shutdown();
+}
 
-  fps_sprite_.setVisible(false);
+void Game::init() {
+  UIManager::instance().init();
 
   createScenes();
-  world_.target()->getKinematic()->position = MathLib::Vec2(0.0f, 0.0f);
 }
 
 void Game::start() {
@@ -57,8 +57,12 @@ void Game::start() {
       const float ratio = static_cast<float>(render_loops) / static_cast<float>(update_loops);
       char text[255];
       sprintf_s(text, "%d RFPS      %d UFPS", static_cast<uint32_t>(fps), static_cast<uint32_t>(fps / ratio));
-      fps_sprite_.loadFromRenderedText(text, SDL_Color FOREGROUND_COLOR, font_, true);
-      fps_sprite_.setVisible(true);
+      if (fps_sprite_ > 0) {
+          UIManager::instance().setText(text, fps_sprite_);
+      }
+      else {
+          fps_sprite_ = UIManager::instance().addText(text);
+      }
 
       render_loops = 0;
       update_loops = 0;
@@ -80,54 +84,14 @@ void Game::handleInput() {
     if (e.type == SDL_QUIT) {
       quit_ = true;
     }
-
     if (e.type == SDL_MOUSEMOTION || e.type == SDL_MOUSEBUTTONDOWN || e.type == SDL_MOUSEBUTTONUP) {
-      if (e.type == SDL_MOUSEBUTTONUP) {
-        int x, y;
-        SDL_GetMouseState(&x, &y);
-
-        world_.target()->getKinematic()->position = Vec2(x, y);
-      }
-      scenes_[curr_scene_]->handleMouseEvent(e);
-    }
-
+        scenes_[curr_scene_]->handleMouseEvent(e);
+    }    
     if (e.type == SDL_KEYDOWN) {
       switch (e.key.keysym.sym) {
         case SDLK_ESCAPE: quit_ = true; break;
         case SDLK_F1:   nextScene(-1); break;
         case SDLK_F2:  nextScene(+1); break;
-        case SDLK_F3:
-          slo_mo_ = clamp<int8_t>(++slo_mo_, 1, 10);
-          printf("Slow Motion Set To %d\n", slo_mo_);
-        break;
-        case SDLK_F4:
-          slo_mo_ = clamp<int8_t>(--slo_mo_, 1, 10);
-          printf("Slow Motion Set To %d\n", slo_mo_);
-        break;
-        case SDLK_F5:
-          DebugDraw::toggleEnabled();
-          printf("Debug Draw Mode Changed\n");
-        break;
-        case SDLK_UP: {
-          world_.target()->getKinematic()->speed += 20.0f;
-          if (world_.target()->getKinematic()->speed > 140.0f) {
-            world_.target()->getKinematic()->speed = 140.0f;
-          }
-          break; }
-        case SDLK_DOWN: {
-          world_.target()->getKinematic()->speed -= 20.0f;
-          if (world_.target()->getKinematic()->speed <= 0.0f) {
-            world_.target()->getKinematic()->speed = 0.0f;
-          }
-          break; }
-        case SDLK_LEFT: {
-          world_.target()->getKinematic()->orientation -= 0.2f;
-          break;
-        }
-        case SDLK_RIGHT: {
-          world_.target()->getKinematic()->orientation += 0.2f;
-          break;
-        }
         default:{}
       }
       scenes_[curr_scene_]->handleKeyEvent(e.key.keysym.sym);
@@ -136,8 +100,7 @@ void Game::handleInput() {
 }
 
 void Game::update(const uint32_t dt) {
-  scenes_[curr_scene_]->update(dt / slo_mo_);
-  world_.update(dt / slo_mo_);
+  scenes_[curr_scene_]->update(dt);
 }
 
 void Game::render() {
@@ -145,10 +108,9 @@ void Game::render() {
   SDL_SetRenderDrawColor(renderer, 0xD0, 0xD0, 0xD0, 0xFF);
   SDL_RenderClear(renderer);
 
-  fps_sprite_.render();
   scenes_[curr_scene_]->render();
-  world_.render();
   DebugDraw::render();
+  UIManager::instance().render();
 
   SDL_RenderPresent(renderer);
 }
@@ -162,5 +124,5 @@ void Game::nextScene(const int8_t sign) {
   scenes_[curr_scene_]->shutdown();
   curr_scene_ += sign;
   curr_scene_ = clamp<int8_t>(curr_scene_, 0, SCENE_NUMBER - 1);
-  scenes_[curr_scene_]->init(&world_);
+  scenes_[curr_scene_]->init();
 }

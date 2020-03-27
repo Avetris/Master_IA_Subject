@@ -9,6 +9,7 @@
 #define __DEFINES_H__ 1
 
 #include "mathlib/vec2.h"
+#include <vector>
 
 #define GAME_NAME "05MVID"
 
@@ -21,15 +22,22 @@
 #define FOREGROUND_COLOR { 0, 0, 0, 255 }
 #define SHADOW_COLOR {160, 160, 160, 255}
 
-#define FONT_FILE "../assets/fonts/8bit.ttf"
+#define FONT_FILE "../assets/fonts/8bit2.ttf"
 #define AGENT_BLUE_PATH "../assets/images/agent_blue.png"
 #define AGENT_RED_PATH "../assets/images/agent_red.png"
 #define AGENT_GREEN_PATH "../assets/images/agent_green.png"
 #define AGENT_PURPLE_PATH "../assets/images/agent_purple.png"
 
-#define FPS_FONT_SIZE 12
+#define MAP_PATH "../assets/images/mapa.bmp"
+
+#define FPS_FONT_SIZE 30 //12
 
 #define SCENE_NUMBER 1
+
+enum PATH_STATUS{
+    FOUND,
+    NOT_FOUND
+};
 
 struct KinematicSteering {
   MathLib::Vec2 velocity{ 0.0f, 0.0f };
@@ -48,6 +56,39 @@ struct KinematicStatus {
   float rotation{0.0f};               //angular velocity
 
   float speed{ 0.0f };
+};
+
+struct t_coord{
+    int x;
+    int y;
+
+    bool operator==(t_coord& other)
+    {
+        return x == other.x && y == other.y;
+    }
+    bool operator!=(const t_coord& other)
+    {
+        return x != other.x || y != other.y;
+    }
+};
+
+struct Path {
+    uint8_t uid = 0;
+    unsigned int pathFound = false;
+    std::vector<t_coord> path;
+    float timeLast = 0.0f;
+};
+
+struct PathNode{
+    unsigned int isOpenClosed;
+    t_coord parent;
+    t_coord position;
+    unsigned short G;
+
+    bool operator()(PathNode*& lhs, PathNode*& rhs)
+    {
+        return lhs->G > rhs->G;
+    }
 };
 
 #endif
