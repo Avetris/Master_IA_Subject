@@ -23,92 +23,20 @@ void Body::init(const Color color, const Type type) {
   }
 
   kinmeticTarget_.position = { -1.0f, -1.0f };
-  steering_mode_ = SteeringMode::Kinematic_Seek;
+  setSteering(SteeringMode::Kinematic_Seek);
 }
 
 void Body::update(const uint32_t dt) {
   if (type_ == Type::Autonomous) {
     KinematicStatus* targetStatus = target_ ? target_->getKinematic() : &kinmeticTarget_;
 
-    if (targetStatus && 
+    if (targetStatus && movement_ && 
         (targetStatus->position.x() > 0 && targetStatus->position.y() > 0)) {
 
-        switch (steering_mode_) {
-        case SteeringMode::Kinematic_Seek: {
-            KinematicSteering steer;
-            k_seek_.calculate(state_, targetStatus, &steer);
-            updateKinematic(dt, steer);
-            setOrientation(state_.velocity);
-            break; }
-        case SteeringMode::Kinematic_Flee: {
-            KinematicSteering steer;
-            k_flee_.calculate(state_, targetStatus, &steer);
-            updateKinematic(dt, steer);
-            setOrientation(state_.velocity);
-            break; }
-        case SteeringMode::Kinematic_Arrive: {
-            KinematicSteering steer;
-            k_arrive_.calculate(state_, targetStatus, &steer);
-            updateKinematic(dt, steer);
-            setOrientation(state_.velocity);
-            break; }
-        case SteeringMode::Kinematic_Wander: {
-            KinematicSteering steer;
-            k_wander_.calculate(state_, targetStatus, &steer);
-            updateKinematic(dt, steer);
-            break; }
-        case SteeringMode::Seek: {
-            Steering steer;
-            seek_.calculate(state_, targetStatus, &steer);
-            updateSteering(dt, steer);
-            setOrientation(state_.velocity);
-            break; }
-        case SteeringMode::Flee: {
-            Steering steer;
-            flee_.calculate(state_, targetStatus, &steer);
-            updateSteering(dt, steer);
-            setOrientation(state_.velocity);
-            break; }
-        case SteeringMode::Arrive: {
-            Steering steer;
-            arrive_.calculate(state_, targetStatus, &steer);
-            updateSteering(dt, steer);
-            setOrientation(state_.velocity);
-            break; }
-        case SteeringMode::Align: {
-            Steering steer;
-            align_.calculate(state_, targetStatus, &steer);
-            updateSteering(dt, steer);
-            //setOrientation(state_.velocity);
-            break; }
-        case SteeringMode::Velocity_Matching: {
-            Steering steer;
-            vel_matching_.calculate(state_, targetStatus, &steer);
-            updateSteering(dt, steer);
-            setOrientation(state_.velocity);
-            break; }
-        case SteeringMode::Pursue: {
-            Steering steer;
-            pursue_.calculate(state_, targetStatus, &steer);
-            updateSteering(dt, steer);
-            setOrientation(state_.velocity);
-            break; }
-        case SteeringMode::Face: {
-            Steering steer;
-            face_.calculate(state_, targetStatus, &steer);
-            updateSteering(dt, steer);
-            break; }
-        case SteeringMode::LookGoing: {
-            Steering steer;
-            look_going_.calculate(state_, targetStatus, &steer);
-            updateSteering(dt, steer);
-            break; }
-        case SteeringMode::Wander: {
-            Steering steer;
-            wander_.calculate(state_, targetStatus, &steer);
-            updateSteering(dt, steer);
-            break; }
-        }
+        Steering steer;
+        movement_.get()->calculate(state_, targetStatus, &steer);
+        updateAutomatic(dt, steer);
+        if(state_.needsToOrientate) setOrientation(state_.velocity);
     }
   } else {
     updateManual(dt);
@@ -135,31 +63,72 @@ void Body::setTarget(Vec2* target) {
     kinmeticTarget_.position = *target;
 }
 
-void Body::updateKinematic(const uint32_t dt, const KinematicSteering& steering) {
-  const float time = dt * 0.001f;             //dt comes in miliseconds
-
-  state_.velocity = steering.velocity;
-  state_.position += steering.velocity * time;
-
-  state_.rotation = steering.rotation;
-  state_.orientation += steering.rotation * time;
-
-  keepInBounds();
-
-  dd.green.pos = state_.position;
-  dd.green.v = state_.velocity;
+void Body::setSteering(const SteeringMode mode)
+{
+    if (movement_) {
+        movement_.reset();
+    }
+    state_.needsToOrientate = true;
+    switch (mode) {
+    case SteeringMode::Kinematic_Seek: {
+        movement_ = std::make_unique<KinematicSeek>();
+        break; }
+    case SteeringMode::Kinematic_Flee: {
+        movement_ = std::make_unique<KinematicFlee>();
+        break; }
+    case SteeringMode::Kinematic_Arrive: {
+        movement_ = std::make_unique<KinematicArrive>();
+        break; }
+    case SteeringMode::Kinematic_Wander: {
+        movement_ = std::make_unique<KinematicWander>();
+        break; }
+    case SteeringMode::Seek: {
+        movement_ = std::make_unique<Seek>();
+        break; }
+    case SteeringMode::Flee: {
+        movement_ = std::make_unique<Flee>();
+        break; }
+    case SteeringMode::Arrive: {
+        movement_ = std::make_unique<Arrive>();
+        break; }
+    case SteeringMode::Align: {
+        state_.needsToOrientate = false;
+        movement_ = std::make_unique<Align>();
+        break; }
+    case SteeringMode::Velocity_Matching: {
+        movement_ = std::make_unique<VelocityMatching>();
+        break; }
+    case SteeringMode::Pursue: {
+        movement_ = std::make_unique<Pursue>();
+        break; }
+    case SteeringMode::Face: {
+        movement_ = std::make_unique<Face>();
+        break; }
+    case SteeringMode::LookGoing: {
+        movement_ = std::make_unique<LookGoing>();
+        break; }
+    case SteeringMode::Wander: {
+        movement_ = std::make_unique<Wander>();
+        break; }
+    }
 }
 
-void Body::updateSteering(const uint32_t dt, const Steering& steering) {
+void Body::updateAutomatic(const uint32_t dt, const Steering& steering) {
   const float time = dt * 0.001f;             //dt comes in miliseconds
 
-  state_.velocity += steering.linear;
-  state_.position += state_.velocity * time;
+  if (isKinematic_) {
+      state_.velocity = steering.velocity;
+      state_.rotation = steering.rotation;
+  }
+  else {
+      state_.velocity += steering.velocity;
+      state_.rotation += steering.rotation;
+  }
+  
+  state_.position += steering.velocity * time;
+  state_.orientation += steering.rotation * time;
 
-  state_.rotation += steering.angular;
-  state_.orientation += state_.rotation * time;
-
-  keepInSpeed();
+  if (!isKinematic_) keepInSpeed();
   keepInBounds();
 
   dd.green.pos = state_.position;

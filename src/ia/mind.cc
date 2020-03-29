@@ -15,12 +15,7 @@ void Mind::init(World* world, Body* body) {
   body_ = body;
 }
 
-void Mind::render() const
-{
-    if (_pathFound.pathFound) {
-        UIManager::instance().drawPath(_pathFound.path);
-    }
-}
+void Mind::render() const{}
 
 void Mind::update(const uint32_t){
 
@@ -61,6 +56,21 @@ void Mind::setPath(Path pathFound)
     else {
         _pathFound.uid = UIManager::instance().addText(text, WINDOW_WIDTH / 2, 0);
     }
+}
+
+std::pair<bool, Path*> Mind::checkDoor(Door* door)
+{
+    std::pair<MathLib::Vec2, MathLib::Vec2> fromTo = door->getCoord();
+    std::pair<bool, Path*> result;
+    result.first = false;
+    for (uint16_t i = _pathFound.index; !result.first && i < _pathFound.path.size();  i++) {
+        if (fromTo.first.x() <= _pathFound.path[i].x() && fromTo.second.x() >= _pathFound.path[i].x() && fromTo.first.y() <= _pathFound.path[i].y() && fromTo.second.y() >= _pathFound.path[i].y()) {
+            result.first = true;
+            result.second = &_pathFound;
+        }
+    }
+
+    return result;
 }
 
 float Mind::getDistance(MathLib::Vec2 origin, MathLib::Vec2 target)

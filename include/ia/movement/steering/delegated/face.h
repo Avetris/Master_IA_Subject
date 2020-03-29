@@ -8,7 +8,6 @@
 #ifndef __FACE_H__
 #define __FACE_H__ 1
 
-#include "ia/defines.h"
 #include "ia/movement/steering/align.h"
 
 class Face : public Align {

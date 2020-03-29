@@ -8,20 +8,17 @@
 #ifndef __KINEMATIC_SEEK_H__
 #define __KINEMATIC_SEEK_H__ 1
 
-#include "ia/defines.h"
+#include "ia/movement/movement.h"
 
-class KinematicSeek {
+class KinematicSeek : public Movement {
   public:
     KinematicSeek() {}
     ~KinematicSeek() {}
 
-    void calculate(const KinematicStatus& character, const KinematicStatus* target, KinematicSteering* steering) const {
+    void calculate(const KinematicStatus& character, const KinematicStatus* target, Steering* steering) override {
       //going full speed towards the target
       steering->velocity = (target->position - character.position).normalized() * max_speed_;
       steering->rotation = 0.0f;     //no rotation
     }
-
-  private:
-    const float max_speed_ = 100.0f;
 };
 #endif

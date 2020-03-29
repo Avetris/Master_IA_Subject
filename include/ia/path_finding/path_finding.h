@@ -16,13 +16,14 @@ class PathFinding {
       Dijstra,
     };
 
-    PathFinding(t_coord startPos, t_coord _goalPos, Agent* target, Type type);
+    PathFinding(t_coord startPos, t_coord _goalPos, Agent* target, bool draw, Type type);
     ~PathFinding() {};
 
     void init(uint8_t map[MAP_L1_WIDTH][MAP_L1_HEIGHT]);
     void findPath();
     Path getPath() const { return _pathFound; }
   private:
+      bool _draw = false;
       Type _type;
       t_coord _startPos, _goalPos;
       PathNode _nodes[MAP_L1_WIDTH][MAP_L1_HEIGHT];

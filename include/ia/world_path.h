@@ -24,6 +24,7 @@ class WorldPath: public World {
         ia_.init(this, Body::Color::Green, Body::Type::Autonomous);
         ia_.getKinematic()->position = Vec2(WINDOW_WIDTH / 2, WINDOW_HEIGHT / 2);
         ia_.setSteering(Body::SteeringMode::Kinematic_Arrive);
+        ia_.getBody()->getMovement()->setTimeToTarget(0.01f);
     };
     ~WorldPath() {
         ia_.shutdown();
@@ -40,6 +41,9 @@ class WorldPath: public World {
         if (doorNumber < 4 && doorNumber >= 0) {
             doors[doorNumber].changeStatus();
             PathManager::instance().applyDoor(&doors[doorNumber]);
+            if (!doors[doorNumber].isOpen()) {
+                ia_.checkDoor(&doors[doorNumber]);
+            }
         }
     }
 

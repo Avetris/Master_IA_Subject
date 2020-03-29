@@ -21,7 +21,7 @@ class PathManager {
 
       ~PathManager() { _loopThread.detach(); };
 
-    void addPath(t_coord startPos, t_coord endPos, Agent* target, PathFinding::Type type);
+    void addPath(t_coord startPos, t_coord endPos, Agent* target, bool draw = false, PathFinding::Type type = PathFinding::Type::A_Manhattan);
     void applyDoor(Door* door);
   private:
     PathManager() {};

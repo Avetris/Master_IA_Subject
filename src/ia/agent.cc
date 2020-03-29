@@ -8,6 +8,7 @@
 #include "ia/agent.h"
 #include "ia/world.h"
 #include <engine\ui_manager.h>
+#include <ia\path_finding\path_manager.h>
 
 void Agent::init(World* world, const Body::Color color, const Body::Type type) {
   world_ = world;
@@ -22,6 +23,17 @@ void Agent::shutdown() {
 void Agent::setPath(Path pathFound)
 {
     mind_.setPath(pathFound);
+}
+
+void Agent::checkDoor(Door* door)
+{
+    std::pair<bool, Path*> result = mind_.checkDoor(door);
+    if (result.first) {
+        t_coord startPos = { body_.getPosition().x(), body_.getPosition().y() };
+        MathLib::Vec2 endVec = result.second->path.back();
+        t_coord endPos = { (int)endVec.x(), (int)endVec.y() };
+        PathManager::instance().addPath(startPos, endPos, this, result.second->draw);
+    }
 }
 
 void Agent::update(const uint32_t dt) {

@@ -6,8 +6,9 @@
 #include <vector>
 #include <algorithm>
 #include <fstream>
+#include <engine\ui_manager.h>
 
-PathFinding::PathFinding(t_coord startPos, t_coord endPos, Agent* target, Type type) : _target(target), _type(type) {
+PathFinding::PathFinding(t_coord startPos, t_coord endPos, Agent* target, bool draw, Type type) : _target(target), _type(type), _draw(draw) {
     _startPos.x = round(startPos.x / 8);
     _startPos.y = round(startPos.y / 8);
     _goalPos.x = round(endPos.x / 8);
@@ -45,12 +46,16 @@ void PathFinding::findPath() {
             _bestNode = &_nodes[_bestNode->parent.x][_bestNode->parent.y];
         }
     }
+    if (_draw) {
+        UIManager::instance().setPath(path);
+    }
     _pathFound = {
         0,
         !path.empty(),
         0,
         path,
-        currentTime / 1000.0f
+        currentTime / 1000.0f,
+        _draw
     };
     if(_target)
         _target->setPath(_pathFound);

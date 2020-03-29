@@ -9,7 +9,6 @@
 #define __PURSUE_H__ 1
 
 #include "engine/debug_draw.h"
-#include "ia/defines.h"
 #include "ia/movement/steering/seek.h"
 
 class Pursue: public Seek {
@@ -36,8 +35,5 @@ class Pursue: public Seek {
       //delegate to seek behavior with new target
       Seek::calculate(character, &new_target, steering);
     }
-
-  private:
-    const float max_prediction_ = 2.0f;
 };
 #endif

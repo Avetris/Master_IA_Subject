@@ -19,10 +19,10 @@ void PathManager::init() {
 	_loopThread = std::thread(&PathManager::calculatePath, this);
 }
 
-void PathManager::addPath(t_coord startPos, t_coord endPos, Agent* target, PathFinding::Type type) {
+void PathManager::addPath(t_coord startPos, t_coord endPos, Agent* target, bool draw, PathFinding::Type type) {
 
 	_mutex.lock();
-	_pathQueue.push({startPos, endPos, target, type });
+	_pathQueue.push({startPos, endPos, target, draw, type });
 	_mutex.unlock();
 }
 

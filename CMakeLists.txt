@@ -78,6 +78,7 @@ set(IA_HEADER_FILES
   ${CMAKE_CURRENT_LIST_DIR}/include/ia/world.h
   ${CMAKE_CURRENT_LIST_DIR}/include/ia/world_steering.h
   ${CMAKE_CURRENT_LIST_DIR}/include/ia/world_path.h
+  ${CMAKE_CURRENT_LIST_DIR}/include/ia/movement/movement.h
   ${CMAKE_CURRENT_LIST_DIR}/include/ia/movement/kinematic/kinematicarrive.h
   ${CMAKE_CURRENT_LIST_DIR}/include/ia/movement/kinematic/kinematicflee.h
   ${CMAKE_CURRENT_LIST_DIR}/include/ia/movement/kinematic/kinematicseek.h

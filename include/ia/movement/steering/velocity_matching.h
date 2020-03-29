@@ -8,26 +8,22 @@
 #ifndef __VELOCITY_MATCHING_H__
 #define __VELOCITY_MATCHING_H__ 1
 
-#include "ia/defines.h"
+#include "ia/movement/movement.h"
 
-class VelocityMatching {
+class VelocityMatching : public Movement{
 public:
   VelocityMatching() {}
   virtual ~VelocityMatching() {}
 
-  void calculate(const KinematicStatus& character, const KinematicStatus* target, Steering* steering) {
+  void calculate(const KinematicStatus& character, const KinematicStatus* target, Steering* steering) override {
     //linear acceleration adjusted to time
-    steering->linear = (target->velocity - character.velocity) / time_to_target_;
-    if (steering->linear.length() > max_acceleration_) {   //max out
+    steering->velocity = (target->velocity - character.velocity) / time_to_target_;
+    if (steering->velocity.length() > max_acceleration_) {   //max out
       //normalized to max acceleration
-      steering->linear = steering->linear.normalized() * max_acceleration_;
+      steering->velocity = steering->velocity.normalized() * max_acceleration_;
     }
 
-    steering->angular = 0.0f;     //no angular
+    steering->rotation = 0.0f;     //no angular
   }
-
-private:
-  const float max_acceleration_ = 5.0f;
-  const float time_to_target_ = 1.0f;
 };
 #endif

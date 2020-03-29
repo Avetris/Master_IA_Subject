@@ -32,7 +32,7 @@ void ScenePath::handleMouseEvent(const SDL_Event e) {
             _fristClick = { x,y };
         }
         else {
-            PathManager::instance().addPath(_fristClick, { x,y }, world_.ia(), _type);
+            PathManager::instance().addPath(_fristClick, { x,y }, world_.ia(), true, _type);
             _fristClick = { -1, -1 };
         }
     }

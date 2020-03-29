@@ -16,6 +16,7 @@ void UIManager::render()
     for (auto& pair : _spriteMap) {
         pair.second.render();
     }
+    drawPath();
 }
 
 uint8_t UIManager::addText(char* text, const uint32_t x, const uint32_t y)
@@ -44,19 +45,21 @@ void UIManager::removeText(uint8_t uid)
     _spriteMap.erase(uid);
 }
 
-void UIManager::drawPath(std::vector<MathLib::Vec2> path)
+void UIManager::drawPath()
 {
-    const int numRect = path.size();
-    SDL_Renderer* renderer = Window::instance().getRenderer();
-    SDL_Rect* rect = new SDL_Rect[numRect];
-    for (size_t i = 0; i < numRect; i++) {
-        rect[i].x = path[i].x();
-        rect[i].y = path[i].y();
-        rect[i].w = 8;
-        rect[i].h = 8;
+    const int numRect = _path.size();
+    if (numRect > 0) {
+        SDL_Renderer* renderer = Window::instance().getRenderer();
+        SDL_Rect* rect = new SDL_Rect[numRect];
+        for (size_t i = 0; i < numRect; i++) {
+            rect[i].x = _path[i].x();
+            rect[i].y = _path[i].y();
+            rect[i].w = 8;
+            rect[i].h = 8;
+        }
+        SDL_SetRenderDrawColor(renderer, 255, 0, 128, 255);
+        SDL_RenderFillRects(renderer, rect, numRect);
     }
-    SDL_SetRenderDrawColor(renderer, 255, 0, 128, 255);
-    SDL_RenderFillRects(renderer, rect, numRect);
 }
 
 void UIManager::shutdown()

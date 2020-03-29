@@ -8,20 +8,17 @@
 #ifndef __SEEK_H__
 #define __SEEK_H__ 1
 
-#include "ia/defines.h"
+#include "ia/movement/movement.h"
 
-class Seek {
+class Seek : public Movement {
   public:
     Seek() {}
     virtual ~Seek() {}
 
-    virtual void calculate(const KinematicStatus& character, const KinematicStatus* target, Steering* steering) {
+    virtual void calculate(const KinematicStatus& character, const KinematicStatus* target, Steering* steering) override {
       //acceleration towards the target
-      steering->linear = (target->position - character.position).normalized() * max_acceleration_;
-      steering->angular = 0.0f;   //no angular
+      steering->velocity = (target->position - character.position).normalized() * max_acceleration_;
+      steering->rotation = 0.0f;   //no angular
     }
-
-  private:
-    const float max_acceleration_ = 5.0f;
 };
 #endif

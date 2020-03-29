@@ -31,6 +31,7 @@ class Agent {
     Body* getBody() { return &body_; }
     void setTarget(Agent* target) {body_.setTarget(target);}
     void setPath(Path pathFound);
+    void checkDoor(Door* door);
   private:
     World * world_ = nullptr;
 

@@ -24,10 +24,13 @@ class UIManager {
     void setText(char* text, uint8_t uid);
     void setColor(uint8_t uid, const SDL_Color& textColor);
     void removeText(uint8_t uid);
-    void drawPath(std::vector<MathLib::Vec2> path);
+    void drawPath();
+    void setPath(std::vector<MathLib::Vec2> path)
+    {
+        _path = path;
+    }
+
     void shutdown();
-
-
 
   private:
     UIManager() {}
@@ -35,5 +38,6 @@ class UIManager {
     uint8_t _UID = 1;
     std::unordered_map<uint8_t, TextSprite> _spriteMap;
     TTF_Font* font_ = nullptr;
+    std::vector<MathLib::Vec2> _path;
 };
 #endif

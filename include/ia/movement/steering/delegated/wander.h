@@ -8,7 +8,6 @@
 #ifndef __WANDER_H__
 #define __WANDER_H__ 1
 
-#include "ia/defines.h"
 #include "ia/movement/steering/delegated/face.h"
 
 class Wander : public Face {
@@ -40,14 +39,7 @@ class Wander : public Face {
       //delegate to face behavior
       Face::calculate(character, &new_target, steering);
       //linear to full acceleration in direction of orientation
-      steering->linear = char_orient * max_acceleration_;
+      steering->velocity = char_orient * max_acceleration_;
     }
-
-  private:
-    float wander_offset_ = 50.0f;       //forward offset of circle
-    float wander_radius_ = 20.0f;       //radius of circle
-    float wander_rate_ = 2.0f;          //max rate at which wander orientation can change
-    float wander_orientation_ = 0.0f;   //current orientation of target
-    float max_acceleration_ = 5.0f;
 };
 #endif

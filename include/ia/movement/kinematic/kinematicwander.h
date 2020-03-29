@@ -8,25 +8,21 @@
 #ifndef __KINEMATIC_WANDER_H__
 #define __KINEMATIC_WANDER_H__ 1
 
-#include "engine/math.h"
+#include "ia/movement/movement.h"
 
-class KinematicWander {
+class KinematicWander : public Movement {
   public:
     KinematicWander() {}
     ~KinematicWander() {}
 
-    void calculate(const KinematicStatus& character, const KinematicStatus*, KinematicSteering* steering) const {
-      MathLib::Vec2 orientation;
-      //orientation of character as vector
-      orientation.fromPolar(1.0f, character.orientation);
+    void calculate(const KinematicStatus& character, const KinematicStatus*, Steering* steering) override {
+        MathLib::Vec2 orientation;
+        //orientation of character as vector
+        orientation.fromPolar(1.0f, character.orientation);
 
-      steering->velocity = orientation * max_speed_;    //max speed
-      //rotate to random (binomial distribution around 0)
-      steering->rotation = max_rotation * (randomFloat(0.0f, 1.0f) - randomFloat(0.0f, 1.0f));
-    }
-
-  private:
-    const float max_speed_ = 50.0f;
-    const float max_rotation = 3.14f;
+        steering->velocity = orientation * max_speed_;    //max speed
+        //rotate to random (binomial distribution around 0)
+        steering->rotation = max_rotation_ * (randomFloat(0.0f, 1.0f) - randomFloat(0.0f, 1.0f));
+    } 
 };
 #endif

@@ -8,14 +8,14 @@
 #ifndef __ARRIVE_H__
 #define __ARRIVE_H__ 1
 
-#include "ia/defines.h"
+#include "ia/movement/movement.h"
 
-class Arrive {
+class Arrive : public Movement {
   public:
     Arrive(){}
     virtual ~Arrive() {}
 
-    virtual void calculate(const KinematicStatus& character, const KinematicStatus* target, Steering* steering) {
+    virtual void calculate(const KinematicStatus& character, const KinematicStatus* target, Steering* steering) override {
       //direction to the target
       const MathLib::Vec2 direction = target->position - character.position;
       const float distance = direction.length();    //distance to target
@@ -29,24 +29,13 @@ class Arrive {
       //velocity towards the target
       const MathLib::Vec2 target_velocity = direction.normalized() * target_speed;
       //linear acceleration adjusted to time
-      steering->linear = (target_velocity - character.velocity) / time_to_target_;
-      if (steering->linear.length() > max_acceleration_) {   //max out
+      steering->velocity = (target_velocity - character.velocity) / time_to_target_;
+      if (steering->velocity.length() > max_acceleration_) {   //max out
         //normalized to max acceleration
-        steering->linear = steering->linear.normalized() * max_acceleration_;
+        steering->velocity = steering->velocity.normalized() * max_acceleration_;
       }
 
-      steering->angular = 0.0f;     //no angular
+      steering->rotation = 0.0f;     //no angular
     }
-
-    void setMaxAcceleration(float max_acceleration) { max_acceleration_ = max_acceleration; }
-    void setMaxSpeed(float max_acceleration) { max_acceleration_ = max_acceleration; }
-    void setSlowRadius(float max_acceleration) { max_acceleration_ = max_acceleration; }
-    void setTimeToTarget(float max_acceleration) { max_acceleration_ = max_acceleration; }
-
-  private:
-    float max_acceleration_ = 5.0f;
-    float max_speed_ = 100.0f;
-    float slow_radius_ = 100.0f;
-    float time_to_target_ = 1.0f;
 };
 #endif

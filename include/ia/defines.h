@@ -45,19 +45,15 @@ enum NODE_COST {
     Diagonal = 14
 };
 
-struct KinematicSteering {
-  MathLib::Vec2 velocity{ 0.0f, 0.0f };
-  float rotation{ 0.0f };
-};
-
 struct Steering {
-  MathLib::Vec2 linear{ 0.0f, 0.0f };    //linear acceleration
-  float angular{ 0.0f };                //angular acceleration
+  MathLib::Vec2 velocity{ 0.0f, 0.0f };    //velocity / linear acceleration
+  float rotation{ 0.0f };                //rotation / angular acceleration
 };
 
 struct KinematicStatus {
   MathLib::Vec2 position{ 0.0f, 0.0f };
   float orientation {0.0f};
+  bool needsToOrientate = true;
   MathLib::Vec2 velocity{ 0.0f, 0.0f };  //linear velocity
   float rotation{0.0f};               //angular velocity
 
@@ -84,6 +80,7 @@ struct Path {
     int index = 0;
     std::vector<MathLib::Vec2> path;
     float timeLast = 0.0f;
+    bool draw = false;
 };
 
 struct PathNode{

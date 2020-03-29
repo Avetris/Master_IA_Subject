@@ -8,14 +8,14 @@
 #ifndef __KINEMATIC_ARRIVE_H__
 #define __KINEMATIC_ARRIVE_H__ 1
 
-#include "ia/defines.h"
+#include "ia/movement/movement.h"
 
-class KinematicArrive {
+class KinematicArrive : public Movement {
   public:
     KinematicArrive() {}
     ~KinematicArrive() {}
 
-    void calculate(const KinematicStatus& character, const KinematicStatus* target, KinematicSteering* steering) const {
+    void calculate(const KinematicStatus& character, const KinematicStatus* target, Steering* steering) override {
       //direction to the target
       steering->velocity = (target->position - character.position);
       if (steering->velocity.length2() < sq_radius_) {  //inside the radius
@@ -30,10 +30,5 @@ class KinematicArrive {
       }
       steering->rotation = 0.0f;   //no rotation
     }
-
-  private:
-    const float max_speed_ = 100.0f;
-    const float sq_radius_ = 10.0f;      //squared radius
-    const float time_to_target_ = 0.01f;
 };
 #endif

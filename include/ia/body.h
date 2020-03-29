@@ -66,22 +66,23 @@ class Body {
 
     void setTarget(Agent* target);
     void setTarget(Vec2* target);
-    void setSteering(const SteeringMode mode) { steering_mode_ = mode; };
+    void setSteering(const SteeringMode mode);
     const KinematicStatus* getKinematic() const { return &state_; }
     KinematicStatus* getKinematic() { return &state_; }
     MathLib::Vec2 getPosition() const { return state_.position; }
+    Movement* getMovement() const { return movement_.get(); }
   private:
-    void updateKinematic(uint32_t dt, const KinematicSteering& steering);
-    void updateSteering(uint32_t dt, const Steering& steering);
+    void updateAutomatic(uint32_t dt, const Steering& steering);
     void updateManual(uint32_t);
     void setOrientation(const MathLib::Vec2& velocity);
     void keepInSpeed();
     void keepInBounds();
 
+    bool isKinematic_ = false;
+
     Sprite sprite_;
     Type type_;
     Color color_;
-    SteeringMode steering_mode_;
     Agent* target_ = nullptr;
     KinematicStatus kinmeticTarget_;
 
@@ -96,21 +97,7 @@ class Body {
 
     KinematicStatus state_;
 
-    KinematicSeek k_seek_;
-    KinematicFlee k_flee_;
-    KinematicArrive k_arrive_;
-    KinematicWander k_wander_;
-
-    Seek seek_;
-    Flee flee_;
-    Arrive arrive_;
-    Align align_;
-    VelocityMatching vel_matching_;
-
-    Pursue pursue_;
-    Face face_;
-    LookGoing look_going_;
-    Wander wander_;
+    std::unique_ptr<Movement> movement_;
 };
 
 #endif

@@ -10,6 +10,7 @@
 
 #include <cstdint>
 #include <ia/defines.h>
+#include <ia\door.h>
 
 class Body;
 class World;
@@ -24,6 +25,7 @@ class Mind {
         void update(uint32_t dt);
 
         void setPath(Path pathFound);
+        std::pair<bool, Path*> checkDoor(Door* door);
     private:
         float getDistance(MathLib::Vec2 origin, MathLib::Vec2 target);
         World* world_ = nullptr;
