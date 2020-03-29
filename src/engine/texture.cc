@@ -56,6 +56,10 @@ bool Texture::loadFromFile(const char* path) {
   }
 
   texture_ = newTexture;
+
+  if (texture_ != nullptr) {
+      textureEnabled_ = true;
+  }
   return texture_ != nullptr;
 }
 
@@ -118,10 +122,15 @@ bool Texture::loadFromRenderedText(const char* textureText, const SDL_Color& tex
     printf("Unable to render text surface! SDL_ttf Error: %s\n", TTF_GetError());
   }
 
+  if (texture_ != nullptr) {
+      textureEnabled_ = true;
+  }
+
   return texture_ != nullptr;
 }
 
 void Texture::free() {
+  textureEnabled_ = false;
   if (texture_) {
     SDL_DestroyTexture(texture_);
     texture_ = nullptr;
@@ -151,5 +160,7 @@ void Texture::renderText(const uint32_t x, const uint32_t y, const SDL_Rect* cli
     renderQuad.w = clip->w;
     renderQuad.h = clip->h;
   }
-  SDL_RenderCopyEx(renderer, texture_, clip, &renderQuad, angle_rad, center, flip);
+  if (texture_ && textureEnabled_) {
+      SDL_RenderCopyEx(renderer, texture_, clip, &renderQuad, angle_rad, center, flip);
+  }
 }

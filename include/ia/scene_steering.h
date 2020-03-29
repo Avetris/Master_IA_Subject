@@ -9,7 +9,8 @@
 #define __SCENE_SEEK_H__ 1
 
 #include "engine/scene.h"
-#include "ia/agent.h""
+#include "ia/agent.h"
+#include <ia\world_steering.h>
 
 class SceneSteering: public Scene {
   public:
@@ -25,7 +26,7 @@ class SceneSteering: public Scene {
     void render() final;
 
   private:
-      World world_;
+      WorldSteering world_;
 
       int8_t slo_mo_ = 1;
 };

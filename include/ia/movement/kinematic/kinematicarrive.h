@@ -33,7 +33,7 @@ class KinematicArrive {
 
   private:
     const float max_speed_ = 100.0f;
-    const float sq_radius_ = 25.0f;      //squared radius
-    const float time_to_target_ = 0.5f;
+    const float sq_radius_ = 10.0f;      //squared radius
+    const float time_to_target_ = 0.01f;
 };
 #endif

@@ -17,7 +17,7 @@
 class Map {
   public:
 
-    void loadMap() {
+    static void loadMap(uint8_t map_l1[MAP_L1_WIDTH][MAP_L1_HEIGHT]) {
       SDL_Surface* map_image;
       if ((map_image = SDL_LoadBMP("../assets/images/costes.bmp")) == false)
         return;
@@ -32,9 +32,9 @@ class Map {
           uint32_t* step_pixels = pixels;
           for (int j = 0; j < MAP_L1_WIDTH; ++j) {
             if ((*step_pixels & 0x00ffffff) == 0) {
-              map_l1[j][i] = 1;     //no walkable
-            } else {
-              map_l1[j][i] = 0;      //walkable
+              map_l1[j][i] = 0;     //no walkable
+            } else{
+              map_l1[j][i] = 1;      //walkable
             }
 
             step_pixels++;
@@ -46,10 +46,12 @@ class Map {
       SDL_UnlockSurface(map_image);
     }
 
-  private:
-
-    //  Tile Map
-    uint8_t map_l1[MAP_L1_WIDTH][MAP_L1_HEIGHT];
+    //unsigned short checkCost(const int w, const int h) {
+    //    if (w < 0 || w >= MAP_L1_WIDTH || h < 0 || h >= MAP_L1_HEIGHT) {
+    //        return false;
+    //    }
+    //    return map_l1[w][h];
+    //}
 };
 
 #endif

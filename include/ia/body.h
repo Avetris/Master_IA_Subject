@@ -65,9 +65,11 @@ class Body {
     void render() const;
 
     void setTarget(Agent* target);
+    void setTarget(Vec2* target);
     void setSteering(const SteeringMode mode) { steering_mode_ = mode; };
     const KinematicStatus* getKinematic() const { return &state_; }
     KinematicStatus* getKinematic() { return &state_; }
+    MathLib::Vec2 getPosition() const { return state_.position; }
   private:
     void updateKinematic(uint32_t dt, const KinematicSteering& steering);
     void updateSteering(uint32_t dt, const Steering& steering);
@@ -80,7 +82,8 @@ class Body {
     Type type_;
     Color color_;
     SteeringMode steering_mode_;
-    Agent* target_;
+    Agent* target_ = nullptr;
+    KinematicStatus kinmeticTarget_;
 
     const float max_speed_ = 100.0f;
 

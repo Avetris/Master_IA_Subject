@@ -31,6 +31,7 @@ class Texture {
     int width_ = 0;
     int height_ = 0;
     uint32_t r_mask_, g_mask_, b_mask_, a_mask_;
+    bool textureEnabled_ = false;
 };
 
 #endif

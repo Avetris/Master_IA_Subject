@@ -12,7 +12,7 @@
 
 class Arrive {
   public:
-    Arrive() {}
+    Arrive(){}
     virtual ~Arrive() {}
 
     virtual void calculate(const KinematicStatus& character, const KinematicStatus* target, Steering* steering) {
@@ -38,10 +38,15 @@ class Arrive {
       steering->angular = 0.0f;     //no angular
     }
 
+    void setMaxAcceleration(float max_acceleration) { max_acceleration_ = max_acceleration; }
+    void setMaxSpeed(float max_acceleration) { max_acceleration_ = max_acceleration; }
+    void setSlowRadius(float max_acceleration) { max_acceleration_ = max_acceleration; }
+    void setTimeToTarget(float max_acceleration) { max_acceleration_ = max_acceleration; }
+
   private:
-    const float max_acceleration_ = 5.0f;
-    const float max_speed_ = 100.0f;
-    const float slow_radius_ = 100.0f;
-    const float time_to_target_ = 1.0f;
+    float max_acceleration_ = 5.0f;
+    float max_speed_ = 100.0f;
+    float slow_radius_ = 100.0f;
+    float time_to_target_ = 1.0f;
 };
 #endif

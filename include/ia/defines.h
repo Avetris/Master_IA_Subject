@@ -20,6 +20,7 @@
 #define MAX_FRAME_SKIP 10
 
 #define FOREGROUND_COLOR { 0, 0, 0, 255 }
+#define ACTIVE_COLOR { 255, 0, 0, 0 }
 #define SHADOW_COLOR {160, 160, 160, 255}
 
 #define FONT_FILE "../assets/fonts/8bit2.ttf"
@@ -35,8 +36,13 @@
 #define SCENE_NUMBER 1
 
 enum PATH_STATUS{
-    FOUND,
-    NOT_FOUND
+    Found,
+    Not_Found
+};
+
+enum NODE_COST {
+    Normal = 10,
+    Diagonal = 14
 };
 
 struct KinematicSteering {
@@ -75,19 +81,22 @@ struct t_coord{
 struct Path {
     uint8_t uid = 0;
     unsigned int pathFound = false;
-    std::vector<t_coord> path;
+    int index = 0;
+    std::vector<MathLib::Vec2> path;
     float timeLast = 0.0f;
 };
 
 struct PathNode{
-    unsigned int isOpenClosed;
+    uint32_t isOpenClosed; // 0 - non; 1 - Opn; 2 - Closed
     t_coord parent;
     t_coord position;
-    unsigned short G;
+    uint16_t G = 0;
+    uint32_t F = 0;
+    uint16_t H = 0;
 
     bool operator()(PathNode*& lhs, PathNode*& rhs)
     {
-        return lhs->G > rhs->G;
+        return lhs->F > rhs->F;
     }
 };
 

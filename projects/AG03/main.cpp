@@ -10,6 +10,7 @@
 #include "ia/defines.h"
 
 #include <ctime>
+#include <ia\scene_steering.h>
 
 int main(int, char* []) {
   srand(time(NULL));
@@ -20,6 +21,7 @@ int main(int, char* []) {
     Game game;
 
     game.init();
+    game.attachScene<SceneSteering>();
     game.start();
     game.shutdown();
   }

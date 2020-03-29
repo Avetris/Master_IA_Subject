@@ -8,11 +8,11 @@
 #include "engine/game.h"
 #include "engine/debug_draw.h"
 #include "engine/window.h"
+#include "engine/ui_manager.h"
 #include "ia/defines.h"
-#include "ia/scene_steering.h"
-#include <engine\ui_manager.h>
 
 #include <cstdio>
+#include "engine/math.h"
 
 Game::~Game()
 {
@@ -21,8 +21,6 @@ Game::~Game()
 
 void Game::init() {
   UIManager::instance().init();
-
-  createScenes();
 }
 
 void Game::start() {
@@ -113,11 +111,6 @@ void Game::render() {
   UIManager::instance().render();
 
   SDL_RenderPresent(renderer);
-}
-
-void Game::createScenes() {
-  scenes_[0] = new SceneSteering();
-  nextScene(0);
 }
 
 void Game::nextScene(const int8_t sign) {
