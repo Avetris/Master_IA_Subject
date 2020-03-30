@@ -14,15 +14,19 @@ class Body;
 class World;
 
 class Mind {
-  public:
-    Mind() {};
-    ~Mind() {};
+public:
+  Mind(World* world, Body* body) : _world(world), _body(body) {};
+  virtual ~Mind() { _world = nullptr; _body = nullptr; };
 
-    void init(World* world, Body* body);
-    void update(uint32_t dt) const;
-  private:
-    World* world_ = nullptr;
-    Body* body_ = nullptr;
+  Mind(const Mind&) = default;
+  Mind(Mind&&) noexcept = default;
+  Mind& operator=(const Mind&) = default;
+  Mind& operator=(Mind&&) noexcept = default;
+
+  virtual void update(uint32_t dt) = 0;
+protected:
+  World* _world = nullptr;
+  Body*_body = nullptr;
 };
 
 #endif

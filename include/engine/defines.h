@@ -5,27 +5,23 @@
 //                                                       |___/___/\____/
 //----------------------------------------------------------------------------
 
-#include "engine/game.h"
-#include "engine/window.h""
-#include "engine/defines.h"
+#ifndef __ENGINE_DEFINES_H__
+#define __ENGINE_DEFINES_H__ 1
 
-#include <ctime>
-#include <cstdlib>
+#define GAME_NAME "05MVID"
 
-int main(int, char* []) {
-  srand(time(NULL));
+#define WINDOW_WIDTH 1024
+#define WINDOW_HEIGHT 1024
 
-  Window::instance().init(GAME_NAME, WINDOW_WIDTH, WINDOW_HEIGHT);
+#define TICKS_PER_SECOND 30
+#define MAX_FRAME_SKIP 10
 
-  {
-    Game game;
+#define FOREGROUND_COLOR { 0, 0, 0, 255 }
+#define SHADOW_COLOR {160, 160, 160, 255}
 
-    game.init();
-    game.start();
-    game.shutdown();
-  }
+#define FONT_FILE "../assets/fonts/8bit.ttf"
+#define FPS_FONT_SIZE 12
 
-  Window::instance().shutdown();
+#define SCENE_NUMBER 1
 
-  return 0;
-}
+#endif

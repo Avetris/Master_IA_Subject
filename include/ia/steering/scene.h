@@ -5,31 +5,26 @@
 //                                                       |___/___/\____/
 //----------------------------------------------------------------------------
 
-#ifndef __GAME_H__
-#define __GAME_H__ 1
+#ifndef __SCENE_SEEK_H__
+#define __SCENE_SEEK_H__ 1
 
-#include "engine/sprite.h"
+#include "engine/scene.h"
+#include "ia/steering/world.h"
 
-#include <SDL/SDL_ttf.h>
-
-class Game {
+class SceneSteering: public Scene {
   public:
-    Game() {};
-    ~Game() {};
+    SceneSteering() {};
+    ~SceneSteering() {};
 
-    void init();
-    void start();
-    void shutdown();
+    void init() final;
+    void shutdown() final;
+
+    void update(uint32_t dt) final;
+    void handleMouseEvent(SDL_Event e, int x, int y) final;
+    void handleKeyEvent(SDL_Keycode key) final;
+    void render() final;
   private:
-    void handleInput();
-    void update(uint32_t dt);
-    void render();
-
-    bool quit_ = false;
-    Sprite fps_sprite_;
-    TTF_Font* font_ = nullptr;
-
-    int8_t slo_mo_ = 1;
+    WorldSteering _world;
 };
 
 #endif

@@ -5,27 +5,16 @@
 //                                                       |___/___/\____/
 //----------------------------------------------------------------------------
 
-#include "engine/game.h"
-#include "engine/window.h""
-#include "engine/defines.h"
+#include "ia/steering/mind.h"
+#include <cstdint>
+#include "ia/steering/body.h"
+#include "ia/world.h"
+#include "ia/steering/world.h"
 
-#include <ctime>
-#include <cstdlib>
+MindSteering::MindSteering(World* world, Body* body)
+  : Mind(world, body) {
+}
 
-int main(int, char* []) {
-  srand(time(NULL));
-
-  Window::instance().init(GAME_NAME, WINDOW_WIDTH, WINDOW_HEIGHT);
-
-  {
-    Game game;
-
-    game.init();
-    game.start();
-    game.shutdown();
-  }
-
-  Window::instance().shutdown();
-
-  return 0;
+void MindSteering::update(uint32_t dt) {
+  static_cast<BodySteering*>(_body)->setTarget(static_cast<WorldSteering*>(_world)->getTarget());
 }

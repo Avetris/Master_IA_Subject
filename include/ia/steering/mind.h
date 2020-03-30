@@ -5,27 +5,17 @@
 //                                                       |___/___/\____/
 //----------------------------------------------------------------------------
 
-#include "engine/game.h"
-#include "engine/window.h""
-#include "engine/defines.h"
+#ifndef __MIND_STEERING_H__
+#define __MIND_STEERING_H__ 1
 
-#include <ctime>
-#include <cstdlib>
+#include "ia/mind.h"
 
-int main(int, char* []) {
-  srand(time(NULL));
+class MindSteering: public Mind {
+  public:
+    MindSteering(World* world, Body* body);
+    ~MindSteering() {};
 
-  Window::instance().init(GAME_NAME, WINDOW_WIDTH, WINDOW_HEIGHT);
+    void update(uint32_t dt) final;
+};
 
-  {
-    Game game;
-
-    game.init();
-    game.start();
-    game.shutdown();
-  }
-
-  Window::instance().shutdown();
-
-  return 0;
-}
+#endif

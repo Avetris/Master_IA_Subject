@@ -7,7 +7,7 @@
 
 #include "engine/texture.h"
 #include "engine/window.h"
-#include "ia/defines.h"
+#include "engine/defines.h"
 
 #include <cstdio>
 #include <SDL/SDL_image.h>

@@ -5,8 +5,8 @@
 //                                                       |___/___/\____/
 //----------------------------------------------------------------------------
 
-#ifndef __ENGINE_DEFINES_H__
-#define __ENGINE_DEFINES_H__ 1
+#ifndef __ENGINE_MATH_DEFINES_H__
+#define __ENGINE_MATH_DEFINES_H__ 1
 
 #include "mathlib/vec2.h"
 

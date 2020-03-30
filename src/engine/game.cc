@@ -7,9 +7,10 @@
 
 #include "engine/game.h"
 #include "engine/debug_draw.h"
+#include "engine/defines.h"
+#include "engine/math.h"
+#include "engine/scene_manager.h"
 #include "engine/window.h"
-#include "ia/defines.h"
-#include "ia/scene_steering.h"
 
 #include <cstdio>
 
@@ -21,8 +22,7 @@ void Game::init() {
 
   fps_sprite_.setVisible(false);
 
-  createScenes();
-  world_.target()->getKinematic()->position = MathLib::Vec2(0.0f, 0.0f);
+  SceneManager::instance().createScenes();
 }
 
 void Game::start() {
@@ -68,10 +68,7 @@ void Game::start() {
 }
 
 void Game::shutdown() {
-  scenes_[curr_scene_]->shutdown();
-  for (uint8_t i = 0; i < SCENE_NUMBER; ++i) {
-    delete scenes_[i];
-  }
+  SceneManager::instance().shutdownScenes();
 }
 
 void Game::handleInput() {
@@ -82,20 +79,16 @@ void Game::handleInput() {
     }
 
     if (e.type == SDL_MOUSEMOTION || e.type == SDL_MOUSEBUTTONDOWN || e.type == SDL_MOUSEBUTTONUP) {
-      if (e.type == SDL_MOUSEBUTTONUP) {
-        int x, y;
-        SDL_GetMouseState(&x, &y);
-
-        world_.target()->getKinematic()->position = Vec2(x, y);
-      }
-      scenes_[curr_scene_]->handleMouseEvent(e);
+      int x, y;
+      SDL_GetMouseState(&x, &y);
+      SceneManager::instance().handleMouseEvent(e, x, y);
     }
 
     if (e.type == SDL_KEYDOWN) {
       switch (e.key.keysym.sym) {
         case SDLK_ESCAPE: quit_ = true; break;
-        case SDLK_F1:   nextScene(-1); break;
-        case SDLK_F2:  nextScene(+1); break;
+        case SDLK_F1:  SceneManager::instance().nextScene(-1); break;
+        case SDLK_F2:  SceneManager::instance().nextScene(+1); break;
         case SDLK_F3:
           slo_mo_ = clamp<int8_t>(++slo_mo_, 1, 10);
           printf("Slow Motion Set To %d\n", slo_mo_);
@@ -108,36 +101,14 @@ void Game::handleInput() {
           DebugDraw::toggleEnabled();
           printf("Debug Draw Mode Changed\n");
         break;
-        case SDLK_UP: {
-          world_.target()->getKinematic()->speed += 20.0f;
-          if (world_.target()->getKinematic()->speed > 140.0f) {
-            world_.target()->getKinematic()->speed = 140.0f;
-          }
-          break; }
-        case SDLK_DOWN: {
-          world_.target()->getKinematic()->speed -= 20.0f;
-          if (world_.target()->getKinematic()->speed <= 0.0f) {
-            world_.target()->getKinematic()->speed = 0.0f;
-          }
-          break; }
-        case SDLK_LEFT: {
-          world_.target()->getKinematic()->orientation -= 0.2f;
-          break;
-        }
-        case SDLK_RIGHT: {
-          world_.target()->getKinematic()->orientation += 0.2f;
-          break;
-        }
-        default:{}
+        default: SceneManager::instance().handleKeyEvent(e.key.keysym.sym);
       }
-      scenes_[curr_scene_]->handleKeyEvent(e.key.keysym.sym);
     }
   }
 }
 
 void Game::update(const uint32_t dt) {
-  scenes_[curr_scene_]->update(dt / slo_mo_);
-  world_.update(dt / slo_mo_);
+  SceneManager::instance().update(dt / slo_mo_);
 }
 
 void Game::render() {
@@ -146,21 +117,8 @@ void Game::render() {
   SDL_RenderClear(renderer);
 
   fps_sprite_.render();
-  scenes_[curr_scene_]->render();
-  world_.render();
+  SceneManager::instance().render();
   DebugDraw::render();
 
   SDL_RenderPresent(renderer);
-}
-
-void Game::createScenes() {
-  scenes_[0] = new SceneSteering();
-  nextScene(0);
-}
-
-void Game::nextScene(const int8_t sign) {
-  scenes_[curr_scene_]->shutdown();
-  curr_scene_ += sign;
-  curr_scene_ = clamp<int8_t>(curr_scene_, 0, SCENE_NUMBER - 1);
-  scenes_[curr_scene_]->init(&world_);
 }
