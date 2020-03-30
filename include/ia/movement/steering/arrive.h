@@ -29,13 +29,13 @@ class Arrive : public Movement {
       //velocity towards the target
       const MathLib::Vec2 target_velocity = direction.normalized() * target_speed;
       //linear acceleration adjusted to time
-      steering->velocity = (target_velocity - character.velocity) / time_to_target_;
-      if (steering->velocity.length() > max_acceleration_) {   //max out
+      steering->velocity_linear = (target_velocity - character.velocity) / time_to_target_;
+      if (steering->velocity_linear.length() > max_acceleration_) {   //max out
         //normalized to max acceleration
-        steering->velocity = steering->velocity.normalized() * max_acceleration_;
+        steering->velocity_linear = steering->velocity_linear.normalized() * max_acceleration_;
       }
 
-      steering->rotation = 0.0f;     //no angular
+      steering->rotation_angular = 0.0f;     //no angular
     }
 };
 #endif

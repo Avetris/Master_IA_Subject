@@ -10,9 +10,10 @@
 #include "ia/agent.h"
 #include "ia/defines.h"
 
-void Body::init(const Color color, const Type type) {
-  type_ = type;
-  color_ = color;
+void Body::init(uint16_t UID, const Color color, const Type type, MathLib::Vec2 position ) {
+    _UID = UID;
+    type_ = type;
+    color_ = color;
 
   switch(color) {
     case Color::Green: sprite_.loadFromFile(AGENT_GREEN_PATH); break;
@@ -22,7 +23,7 @@ void Body::init(const Color color, const Type type) {
     default: sprite_.loadFromFile(AGENT_GREEN_PATH);
   }
 
-  kinmeticTarget_.position = { -1.0f, -1.0f };
+  kinmeticTarget_.position = position;
   setSteering(SteeringMode::Kinematic_Seek);
 }
 
@@ -117,16 +118,16 @@ void Body::updateAutomatic(const uint32_t dt, const Steering& steering) {
   const float time = dt * 0.001f;             //dt comes in miliseconds
 
   if (isKinematic_) {
-      state_.velocity = steering.velocity;
-      state_.rotation = steering.rotation;
+      state_.velocity = steering.velocity_linear;
+      state_.rotation = steering.rotation_angular;
   }
   else {
-      state_.velocity += steering.velocity;
-      state_.rotation += steering.rotation;
+      state_.velocity += steering.velocity_linear;
+      state_.rotation += steering.rotation_angular;
   }
   
-  state_.position += steering.velocity * time;
-  state_.orientation += steering.rotation * time;
+  state_.position += steering.velocity_linear * time;
+  state_.orientation += steering.rotation_angular * time;
 
   if (!isKinematic_) keepInSpeed();
   keepInBounds();

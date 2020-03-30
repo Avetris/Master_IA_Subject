@@ -17,8 +17,8 @@ class Flee : public Movement {
 
     virtual void calculate(const KinematicStatus& character, const KinematicStatus* target, Steering* steering) override {
       //acceleration opposite to the target
-      steering->velocity = (character.position - target->position).normalized() * max_acceleration_;
-      steering->rotation = 0.0f;   //no angular
+      steering->velocity_linear = (character.position - target->position).normalized() * max_acceleration_;
+      steering->rotation_angular = 0.0f;   //no angular
     }
 };
 #endif

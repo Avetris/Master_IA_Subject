@@ -10,10 +10,12 @@
 #include <engine\ui_manager.h>
 #include <ia\path_finding\path_manager.h>
 
-void Agent::init(World* world, const Body::Color color, const Body::Type type) {
+uint16_t Agent::_GUID = 0;
+
+void Agent::init(World* world, const Body::Color color, const Body::Type type, MathLib::Vec2 position) {
   world_ = world;
-  body_.init(color, type);
-  mind_.init(world, &body_);
+  body_.init(_UID, color, type, position);
+  mind_.init(_UID, world, &body_);
 }
 
 void Agent::shutdown() {

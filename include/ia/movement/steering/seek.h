@@ -17,8 +17,8 @@ class Seek : public Movement {
 
     virtual void calculate(const KinematicStatus& character, const KinematicStatus* target, Steering* steering) override {
       //acceleration towards the target
-      steering->velocity = (target->position - character.position).normalized() * max_acceleration_;
-      steering->rotation = 0.0f;   //no angular
+      steering->velocity_linear = (target->position - character.position).normalized() * max_acceleration_;
+      steering->rotation_angular = 0.0f;   //no angular
     }
 };
 #endif

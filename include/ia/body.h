@@ -57,10 +57,11 @@ class Body {
       Wander,                 //f
     };
 
-    Body() {};
+    Body(){};
     ~Body() {};
+    uint16_t _UID;
 
-    void init(Color color, Type type);
+    void init(uint16_t UID, Color color, Type type, MathLib::Vec2 position);
     void update(uint32_t dt);
     void render() const;
 
@@ -71,20 +72,25 @@ class Body {
     KinematicStatus* getKinematic() { return &state_; }
     MathLib::Vec2 getPosition() const { return state_.position; }
     Movement* getMovement() const { return movement_.get(); }
+  protected:
+      void updateAutomatic(uint32_t dt, const Steering& steering);
+      void setOrientation(const MathLib::Vec2& velocity);
+
+      Sprite sprite_;
+      KinematicStatus state_;
+      Agent* target_ = nullptr;
+      KinematicStatus kinmeticTarget_;
+      std::unique_ptr<Movement> movement_;
+
   private:
-    void updateAutomatic(uint32_t dt, const Steering& steering);
     void updateManual(uint32_t);
-    void setOrientation(const MathLib::Vec2& velocity);
     void keepInSpeed();
     void keepInBounds();
 
     bool isKinematic_ = false;
 
-    Sprite sprite_;
     Type type_;
     Color color_;
-    Agent* target_ = nullptr;
-    KinematicStatus kinmeticTarget_;
 
     const float max_speed_ = 100.0f;
 
@@ -95,9 +101,7 @@ class Body {
       } green, red, blue;
     } dd;
 
-    KinematicStatus state_;
 
-    std::unique_ptr<Movement> movement_;
 };
 
 #endif

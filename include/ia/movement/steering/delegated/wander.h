@@ -39,7 +39,7 @@ class Wander : public Face {
       //delegate to face behavior
       Face::calculate(character, &new_target, steering);
       //linear to full acceleration in direction of orientation
-      steering->velocity = char_orient * max_acceleration_;
+      steering->velocity_linear = char_orient * max_acceleration_;
     }
 };
 #endif

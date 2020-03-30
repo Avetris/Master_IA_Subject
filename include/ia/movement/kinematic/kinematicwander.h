@@ -20,9 +20,9 @@ class KinematicWander : public Movement {
         //orientation of character as vector
         orientation.fromPolar(1.0f, character.orientation);
 
-        steering->velocity = orientation * max_speed_;    //max speed
+        steering->velocity_linear = orientation * max_speed_;    //max speed
         //rotate to random (binomial distribution around 0)
-        steering->rotation = max_rotation_ * (randomFloat(0.0f, 1.0f) - randomFloat(0.0f, 1.0f));
+        steering->rotation_angular = max_rotation_ * (randomFloat(0.0f, 1.0f) - randomFloat(0.0f, 1.0f));
     } 
 };
 #endif

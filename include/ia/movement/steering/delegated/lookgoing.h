@@ -17,7 +17,7 @@ class LookGoing : public Align {
 
     void calculate(const KinematicStatus& character, const KinematicStatus* target, Steering* steering) override {
       if (character.velocity.length() ==0) {      //no movement
-        steering->rotation = 0.0f;
+        steering->rotation_angular = 0.0f;
         return;
       }
 

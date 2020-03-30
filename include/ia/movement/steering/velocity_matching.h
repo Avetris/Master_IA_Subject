@@ -17,13 +17,13 @@ public:
 
   void calculate(const KinematicStatus& character, const KinematicStatus* target, Steering* steering) override {
     //linear acceleration adjusted to time
-    steering->velocity = (target->velocity - character.velocity) / time_to_target_;
-    if (steering->velocity.length() > max_acceleration_) {   //max out
+    steering->velocity_linear = (target->velocity - character.velocity) / time_to_target_;
+    if (steering->velocity_linear.length() > max_acceleration_) {   //max out
       //normalized to max acceleration
-      steering->velocity = steering->velocity.normalized() * max_acceleration_;
+      steering->velocity_linear = steering->velocity_linear.normalized() * max_acceleration_;
     }
 
-    steering->rotation = 0.0f;     //no angular
+    steering->rotation_angular = 0.0f;     //no angular
   }
 };
 #endif

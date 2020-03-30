@@ -2,8 +2,6 @@
 #include "engine/window.h""
 #include "ia/defines.h"
 
-#include <ctime>
-#include <ia\path_finding\path_manager.h>
 #include <ia\scene_path.h>
 
 int main(int, char* []) {

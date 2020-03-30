@@ -17,10 +17,11 @@ class World;
 
 class Agent {
   public:
-    Agent() {};
+     Agent() { _UID = _GUID++;};
     ~Agent() {};
+    uint16_t _UID;
 
-    void init(World* world, Body::Color color, Body::Type type);
+    void init(World* world, Body::Color color, Body::Type type, MathLib::Vec2 position = { -1.0f, -1.0f });
     void update(uint32_t dt);
     void render() const;
     void shutdown();
@@ -33,7 +34,8 @@ class Agent {
     void setPath(Path pathFound);
     void checkDoor(Door* door);
   private:
-    World * world_ = nullptr;
+    static uint16_t _GUID;
+    World* world_ = nullptr;
 
     Body body_;
     Mind mind_;

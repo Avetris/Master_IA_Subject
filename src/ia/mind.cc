@@ -10,14 +10,15 @@
 #include "ia/world.h"
 #include <engine\ui_manager.h>
 
-void Mind::init(World* world, Body* body) {
-  world_ = world;
-  body_ = body;
+void Mind::init(uint16_t UID, World* world, Body* body) {
+    _UID = UID;
+    world_ = world;
+    body_ = body;
 }
 
 void Mind::render() const{}
 
-void Mind::update(const uint32_t){
+void Mind::update(const uint32_t dt){
 
     if (_pathFound.pathFound && !_pathFound.path.empty() && _pathFound.index < _pathFound.path.size()) {
         Vec2* nextCoord = &_pathFound.path[_pathFound.index];

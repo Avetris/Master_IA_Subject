@@ -17,10 +17,11 @@ class World;
 
 class Mind {
     public:
-        Mind() {};
+        Mind(){};
         ~Mind() {};
+        uint16_t _UID;
 
-        void init(World* world, Body* body);
+        void init(uint16_t UID, World* world, Body* body);
         void render() const;
         void update(uint32_t dt);
 
@@ -28,6 +29,7 @@ class Mind {
         std::pair<bool, Path*> checkDoor(Door* door);
     private:
         float getDistance(MathLib::Vec2 origin, MathLib::Vec2 target);
+    protected:
         World* world_ = nullptr;
         Body* body_ = nullptr;
 

@@ -62,7 +62,10 @@ set(IA_SRC_FILES
   ${CMAKE_CURRENT_LIST_DIR}/src/ia/path_finding/path_finding.cc
   ${CMAKE_CURRENT_LIST_DIR}/src/ia/path_finding/path_manager.cc
   ${CMAKE_CURRENT_LIST_DIR}/src/ia/scene_steering.cc
-  ${CMAKE_CURRENT_LIST_DIR}/src/ia/scene_path.cc)
+  ${CMAKE_CURRENT_LIST_DIR}/src/ia/scene_path.cc
+  ${CMAKE_CURRENT_LIST_DIR}/src/ia/scene_opt.cc
+  ${CMAKE_CURRENT_LIST_DIR}/src/ia/flocking/flocking_manager.cc
+  ${CMAKE_CURRENT_LIST_DIR}/src/ia/flocking/flocking_body.cc)
 
 set(IA_HEADER_FILES
   ${CMAKE_CURRENT_LIST_DIR}/include/ia/agent.h
@@ -75,9 +78,11 @@ set(IA_HEADER_FILES
   ${CMAKE_CURRENT_LIST_DIR}/include/ia/path_finding/path_manager.h
   ${CMAKE_CURRENT_LIST_DIR}/include/ia/scene_steering.h
   ${CMAKE_CURRENT_LIST_DIR}/include/ia/scene_path.h
+  ${CMAKE_CURRENT_LIST_DIR}/include/ia/scene_opt.h
   ${CMAKE_CURRENT_LIST_DIR}/include/ia/world.h
   ${CMAKE_CURRENT_LIST_DIR}/include/ia/world_steering.h
   ${CMAKE_CURRENT_LIST_DIR}/include/ia/world_path.h
+  ${CMAKE_CURRENT_LIST_DIR}/include/ia/world_opt.h
   ${CMAKE_CURRENT_LIST_DIR}/include/ia/movement/movement.h
   ${CMAKE_CURRENT_LIST_DIR}/include/ia/movement/kinematic/kinematicarrive.h
   ${CMAKE_CURRENT_LIST_DIR}/include/ia/movement/kinematic/kinematicflee.h
@@ -91,7 +96,14 @@ set(IA_HEADER_FILES
   ${CMAKE_CURRENT_LIST_DIR}/include/ia/movement/steering/arrive.h
   ${CMAKE_CURRENT_LIST_DIR}/include/ia/movement/steering/flee.h
   ${CMAKE_CURRENT_LIST_DIR}/include/ia/movement/steering/seek.h
-  ${CMAKE_CURRENT_LIST_DIR}/include/ia/movement/steering/velocity_matching.h)
+  ${CMAKE_CURRENT_LIST_DIR}/include/ia/movement/steering/velocity_matching.h
+  ${CMAKE_CURRENT_LIST_DIR}/include/ia/flocking/flocking_manager.h
+  ${CMAKE_CURRENT_LIST_DIR}/include/ia/flocking/flocking_agent.h
+  ${CMAKE_CURRENT_LIST_DIR}/include/ia/flocking/flocking_mind.h
+  ${CMAKE_CURRENT_LIST_DIR}/include/ia/flocking/flocking_body.h
+  ${CMAKE_CURRENT_LIST_DIR}/include/ia/flocking/alignment.h
+  ${CMAKE_CURRENT_LIST_DIR}/include/ia/flocking/cohesion.h
+  ${CMAKE_CURRENT_LIST_DIR}/include/ia/flocking/separation.h)
 
 source_group(TREE ${CMAKE_CURRENT_SOURCE_DIR}/src
   PREFIX "Source Files"

@@ -17,8 +17,8 @@ class KinematicSeek : public Movement {
 
     void calculate(const KinematicStatus& character, const KinematicStatus* target, Steering* steering) override {
       //going full speed towards the target
-      steering->velocity = (target->position - character.position).normalized() * max_speed_;
-      steering->rotation = 0.0f;     //no rotation
+      steering->velocity_linear = (target->position - character.position).normalized() * max_speed_;
+      steering->rotation_angular = 0.0f;     //no rotation
     }
 };
 #endif

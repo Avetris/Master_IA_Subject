@@ -17,18 +17,18 @@ class KinematicArrive : public Movement {
 
     void calculate(const KinematicStatus& character, const KinematicStatus* target, Steering* steering) override {
       //direction to the target
-      steering->velocity = (target->position - character.position);
-      if (steering->velocity.length2() < sq_radius_) {  //inside the radius
-        steering->velocity.x() = 0.0f;        //no velocity
-        steering->velocity.y() = 0.0f;
+      steering->velocity_linear = (target->position - character.position);
+      if (steering->velocity_linear.length2() < sq_radius_) {  //inside the radius
+        steering->velocity_linear.x() = 0.0f;        //no velocity
+        steering->velocity_linear.y() = 0.0f;
       } else {
-        steering->velocity /= time_to_target_;     //velocity adjusted to time
-        if (steering->velocity.length() > max_speed_) {     //max out
+        steering->velocity_linear /= time_to_target_;     //velocity adjusted to time
+        if (steering->velocity_linear.length() > max_speed_) {     //max out
           //normalized direction to max speed
-          steering->velocity = steering->velocity.normalized() * max_speed_;
+          steering->velocity_linear = steering->velocity_linear.normalized() * max_speed_;
         }
       }
-      steering->rotation = 0.0f;   //no rotation
+      steering->rotation_angular = 0.0f;   //no rotation
     }
 };
 #endif

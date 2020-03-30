@@ -46,8 +46,8 @@ enum NODE_COST {
 };
 
 struct Steering {
-  MathLib::Vec2 velocity{ 0.0f, 0.0f };    //velocity / linear acceleration
-  float rotation{ 0.0f };                //rotation / angular acceleration
+  MathLib::Vec2 velocity_linear{ 0.0f, 0.0f };    //velocity / linear acceleration
+  float rotation_angular{ 0.0f };                //rotation / angular acceleration
 };
 
 struct KinematicStatus {
