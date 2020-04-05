@@ -16,25 +16,19 @@ class Body;
 class World;
 
 class Mind {
-    public:
-        Mind(){};
-        ~Mind() {};
-        uint16_t _UID;
+public:
+  Mind(World* world, Body* body) : _world(world), _body(body) {};
+  virtual ~Mind() { _world = nullptr; _body = nullptr; };
 
-        void init(uint16_t UID, World* world, Body* body);
-        void render() const;
-        void update(uint32_t dt);
+  Mind(const Mind&) = default;
+  Mind(Mind&&) noexcept = default;
+  Mind& operator=(const Mind&) = default;
+  Mind& operator=(Mind&&) noexcept = default;
 
-        void setPath(Path pathFound);
-        std::pair<bool, Path*> checkDoor(Door* door);
-    private:
-        float getDistance(MathLib::Vec2 origin, MathLib::Vec2 target);
-    protected:
-        World* world_ = nullptr;
-        Body* body_ = nullptr;
-
-        Path _pathFound;
-        float _chagenDist = 0.0f;
+  virtual void update(uint32_t dt) = 0;
+protected:
+  World* _world = nullptr;
+  Body*_body = nullptr;
 };
 
 #endif

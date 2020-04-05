@@ -19,14 +19,14 @@ public:
     }
 
     void setText(char* text) {
-        free();
+        freeTexture();
         _text = text;
         loadFromRenderedText(text, _textColor, _font, _shadow, _wrapped);
     }
 
 
     void setTextColor(const SDL_Color& color) {
-        free();
+        freeTexture();
         _textColor = color;
         loadFromRenderedText(_text, color, _font, _shadow, _wrapped);
     }

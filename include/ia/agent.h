@@ -8,37 +8,40 @@
 #ifndef __AGENT_H__
 #define __AGENT_H__ 1
 
-#include <ia\body.h>
-#include <ia\mind.h>
+#include "ia/defines.h"
 
 #include <cstdint>
+#include "steering/body.h"
+#include "steering/mind.h"
 
 class World;
 
 class Agent {
   public:
-     Agent() { _UID = _GUID++;};
-    ~Agent() {};
-    uint16_t _UID;
+    Agent() = default;
+    Agent(World* world, Color color, Type type, BodyType bodyType, MindType mindType);
+    ~Agent();
 
-    void init(World* world, Body::Color color, Body::Type type, MathLib::Vec2 position = { -1.0f, -1.0f });
+    Agent(const Agent&) = default;
+    Agent(Agent&&) noexcept = default;
+    Agent& operator=(const Agent&) = default;
+    Agent& operator=(Agent&&) noexcept = default;
+
     void update(uint32_t dt);
     void render() const;
-    void shutdown();
 
-    void setSteering(Body::SteeringMode steering) { body_.setSteering(steering); }   
-    const KinematicStatus* getKinematic() const { return body_.getKinematic(); }
-    KinematicStatus* getKinematic() { return body_.getKinematic(); }
-    Body* getBody() { return &body_; }
-    void setTarget(Agent* target) {body_.setTarget(target);}
-    void setPath(Path pathFound);
-    void checkDoor(Door* door);
+    const KinematicStatus* getKinematic() const { return _body->getKinematic(); }
+    KinematicStatus* getKinematic() { return _body->getKinematic(); }
+
+    Body* getBody() { return _body.get();}
+    Mind* getMind() {return _mind.get();}
+
   private:
     static uint16_t _GUID;
-    World* world_ = nullptr;
+    World * _world = nullptr;
 
-    Body body_;
-    Mind mind_;
+    std::unique_ptr<Body> _body;
+    std::unique_ptr<Mind> _mind;
 };
 
 #endif

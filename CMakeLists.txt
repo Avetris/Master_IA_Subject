@@ -39,6 +39,7 @@ set(MATHLIB_HEADER_FILES
 set(ENGINE_SRC_FILES
   ${CMAKE_CURRENT_LIST_DIR}/src/engine/debug_draw.cc
   ${CMAKE_CURRENT_LIST_DIR}/src/engine/game.cc
+  ${CMAKE_CURRENT_LIST_DIR}/src/engine/scene_manager.cc
   ${CMAKE_CURRENT_LIST_DIR}/src/engine/sprite.cc
   ${CMAKE_CURRENT_LIST_DIR}/src/engine/texture.cc
   ${CMAKE_CURRENT_LIST_DIR}/src/engine/ui_manager.cc
@@ -46,9 +47,11 @@ set(ENGINE_SRC_FILES
 
 set(ENGINE_HEADER_FILES
   ${CMAKE_CURRENT_LIST_DIR}/include/engine/debug_draw.h
+  ${CMAKE_CURRENT_LIST_DIR}/include/engine/defines.h
   ${CMAKE_CURRENT_LIST_DIR}/include/engine/game.h
   ${CMAKE_CURRENT_LIST_DIR}/include/engine/math.h
   ${CMAKE_CURRENT_LIST_DIR}/include/engine/scene.h
+  ${CMAKE_CURRENT_LIST_DIR}/include/engine/scene_manager.h
   ${CMAKE_CURRENT_LIST_DIR}/include/engine/sprite.h
   ${CMAKE_CURRENT_LIST_DIR}/include/engine/text_sprite.h
   ${CMAKE_CURRENT_LIST_DIR}/include/engine/texture.h
@@ -56,33 +59,14 @@ set(ENGINE_HEADER_FILES
   ${CMAKE_CURRENT_LIST_DIR}/include/engine/window.h)
 
 set(IA_SRC_FILES
-  ${CMAKE_CURRENT_LIST_DIR}/src/ia/agent.cc
-  ${CMAKE_CURRENT_LIST_DIR}/src/ia/body.cc
-  ${CMAKE_CURRENT_LIST_DIR}/src/ia/mind.cc
-  ${CMAKE_CURRENT_LIST_DIR}/src/ia/path_finding/path_finding.cc
-  ${CMAKE_CURRENT_LIST_DIR}/src/ia/path_finding/path_manager.cc
-  ${CMAKE_CURRENT_LIST_DIR}/src/ia/scene_steering.cc
-  ${CMAKE_CURRENT_LIST_DIR}/src/ia/scene_path.cc
-  ${CMAKE_CURRENT_LIST_DIR}/src/ia/scene_opt.cc
-  ${CMAKE_CURRENT_LIST_DIR}/src/ia/flocking/flocking_manager.cc
-  ${CMAKE_CURRENT_LIST_DIR}/src/ia/flocking/flocking_body.cc)
+  ${CMAKE_CURRENT_LIST_DIR}/src/ia/agent.cc)
 
 set(IA_HEADER_FILES
   ${CMAKE_CURRENT_LIST_DIR}/include/ia/agent.h
   ${CMAKE_CURRENT_LIST_DIR}/include/ia/body.h
   ${CMAKE_CURRENT_LIST_DIR}/include/ia/defines.h
-  ${CMAKE_CURRENT_LIST_DIR}/include/ia/map.h
   ${CMAKE_CURRENT_LIST_DIR}/include/ia/mind.h
-  ${CMAKE_CURRENT_LIST_DIR}/include/ia/door.h
-  ${CMAKE_CURRENT_LIST_DIR}/include/ia/path_finding/path_finding.h
-  ${CMAKE_CURRENT_LIST_DIR}/include/ia/path_finding/path_manager.h
-  ${CMAKE_CURRENT_LIST_DIR}/include/ia/scene_steering.h
-  ${CMAKE_CURRENT_LIST_DIR}/include/ia/scene_path.h
-  ${CMAKE_CURRENT_LIST_DIR}/include/ia/scene_opt.h
   ${CMAKE_CURRENT_LIST_DIR}/include/ia/world.h
-  ${CMAKE_CURRENT_LIST_DIR}/include/ia/world_steering.h
-  ${CMAKE_CURRENT_LIST_DIR}/include/ia/world_path.h
-  ${CMAKE_CURRENT_LIST_DIR}/include/ia/world_opt.h
   ${CMAKE_CURRENT_LIST_DIR}/include/ia/movement/movement.h
   ${CMAKE_CURRENT_LIST_DIR}/include/ia/movement/kinematic/kinematicarrive.h
   ${CMAKE_CURRENT_LIST_DIR}/include/ia/movement/kinematic/kinematicflee.h
@@ -96,21 +80,50 @@ set(IA_HEADER_FILES
   ${CMAKE_CURRENT_LIST_DIR}/include/ia/movement/steering/arrive.h
   ${CMAKE_CURRENT_LIST_DIR}/include/ia/movement/steering/flee.h
   ${CMAKE_CURRENT_LIST_DIR}/include/ia/movement/steering/seek.h
-  ${CMAKE_CURRENT_LIST_DIR}/include/ia/movement/steering/velocity_matching.h
-  ${CMAKE_CURRENT_LIST_DIR}/include/ia/flocking/flocking_manager.h
-  ${CMAKE_CURRENT_LIST_DIR}/include/ia/flocking/flocking_agent.h
-  ${CMAKE_CURRENT_LIST_DIR}/include/ia/flocking/flocking_mind.h
-  ${CMAKE_CURRENT_LIST_DIR}/include/ia/flocking/flocking_body.h
-  ${CMAKE_CURRENT_LIST_DIR}/include/ia/flocking/alignment.h
-  ${CMAKE_CURRENT_LIST_DIR}/include/ia/flocking/cohesion.h
-  ${CMAKE_CURRENT_LIST_DIR}/include/ia/flocking/separation.h)
+  ${CMAKE_CURRENT_LIST_DIR}/include/ia/movement/steering/velocity_matching.h)
+
+set(IA_STEERING_SRC_FILES
+  ${CMAKE_CURRENT_LIST_DIR}/src/ia/steering/body.cc
+  ${CMAKE_CURRENT_LIST_DIR}/src/ia/steering/mind.cc
+  ${CMAKE_CURRENT_LIST_DIR}/src/ia/steering/scene.cc
+)
+
+set(IA_STEERING_HEADER_FILES
+  ${CMAKE_CURRENT_LIST_DIR}/include/ia/steering/body.h
+  ${CMAKE_CURRENT_LIST_DIR}/include/ia/steering/mind.h
+  ${CMAKE_CURRENT_LIST_DIR}/include/ia/steering/scene.h
+  ${CMAKE_CURRENT_LIST_DIR}/include/ia/steering/world.h
+)
+
+set(IA_PATHFINDING_HEADER_FILES
+  ${CMAKE_CURRENT_LIST_DIR}/include/ia/pathfinding/map_world.h
+  ${CMAKE_CURRENT_LIST_DIR}/include/ia/pathfinding/binary_heap.h
+  ${CMAKE_CURRENT_LIST_DIR}/include/ia/pathfinding/map.h
+  ${CMAKE_CURRENT_LIST_DIR}/include/ia/pathfinding/path_manager.h
+  ${CMAKE_CURRENT_LIST_DIR}/include/ia/pathfinding/path_finding.h
+  ${CMAKE_CURRENT_LIST_DIR}/include/ia/pathfinding/body.h
+  ${CMAKE_CURRENT_LIST_DIR}/include/ia/pathfinding/mind.h
+  ${CMAKE_CURRENT_LIST_DIR}/include/ia/pathfinding/scene.h
+  ${CMAKE_CURRENT_LIST_DIR}/include/ia/pathfinding/world.h
+)
+
+set(IA_PATHFINDING_SRC_FILES
+  ${CMAKE_CURRENT_LIST_DIR}/src/ia/pathfinding/map_world.cc
+  ${CMAKE_CURRENT_LIST_DIR}/src/ia/pathfinding/path_manager.cc
+  ${CMAKE_CURRENT_LIST_DIR}/src/ia/pathfinding/path_finding.cc
+  ${CMAKE_CURRENT_LIST_DIR}/src/ia/pathfinding/body.cc
+  ${CMAKE_CURRENT_LIST_DIR}/src/ia/pathfinding/mind.cc
+  ${CMAKE_CURRENT_LIST_DIR}/src/ia/pathfinding/scene.cc
+)
 
 source_group(TREE ${CMAKE_CURRENT_SOURCE_DIR}/src
   PREFIX "Source Files"
-  FILES ${NET_SRC_FILES} ${MATHLIB_SRC_FILES} ${ENGINE_SRC_FILES} ${IA_SRC_FILES})
+  FILES ${NET_SRC_FILES} ${MATHLIB_SRC_FILES} ${ENGINE_SRC_FILES}
+    ${IA_SRC_FILES} ${IA_STEERING_SRC_FILES} ${IA_PATHFINDING_SRC_FILES})
 source_group(TREE ${CMAKE_CURRENT_SOURCE_DIR}/include
   PREFIX "Header Files"
-  FILES ${CONTAINERS_HEADER_FILES} ${NET_HEADER_FILES} ${MATHLIB_HEADER_FILES} ${ENGINE_HEADER_FILES} ${IA_HEADER_FILES})
+  FILES ${CONTAINERS_HEADER_FILES} ${NET_HEADER_FILES} ${MATHLIB_HEADER_FILES} ${ENGINE_HEADER_FILES}
+    ${IA_HEADER_FILES} ${IA_STEERING_HEADER_FILES} ${IA_PATHFINDING_HEADER_FILES})
 
 #****************************************************
 # AG01 - Multithreading
@@ -189,3 +202,8 @@ set(IA_PROJECTS AG03 ACT03 ACT04 OPT01)
 foreach(PROJECT ${IA_PROJECTS})
   project_for_ia(${PROJECT})
 endforeach()
+
+target_sources(AG03 PRIVATE ${IA_STEERING_SRC_FILES} ${IA_STEERING_HEADER_FILES} ${IA_PATHFINDING_HEADER_FILES} ${IA_PATHFINDING_SRC_FILES})
+target_sources(OPT01 PRIVATE ${IA_STEERING_SRC_FILES} ${IA_STEERING_HEADER_FILES} ${IA_PATHFINDING_HEADER_FILES} ${IA_PATHFINDING_SRC_FILES})
+target_sources(ACT03 PRIVATE ${IA_STEERING_SRC_FILES} ${IA_STEERING_HEADER_FILES} ${IA_PATHFINDING_HEADER_FILES} ${IA_PATHFINDING_SRC_FILES})
+target_sources(ACT04 PRIVATE "")

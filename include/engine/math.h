@@ -5,8 +5,8 @@
 //                                                       |___/___/\____/
 //----------------------------------------------------------------------------
 
-#ifndef __ENGINE_DEFINES_H__
-#define __ENGINE_DEFINES_H__ 1
+#ifndef __ENGINE_MATH_DEFINES_H__
+#define __ENGINE_MATH_DEFINES_H__ 1
 
 #include "mathlib/vec2.h"
 
@@ -64,6 +64,13 @@ inline float wrapAngle360(float x) {
 //returns (-1, 0 , 1), the sign of the number
 template <typename T> int sign(T val) {
   return (T(0) < val) - (val < T(0));
+}
+
+template <typename T> void swap(T* x, T* y)
+{
+    T temp = *x;
+    *x = *y;
+    *y = temp;
 }
 
 #endif

@@ -7,20 +7,17 @@
 
 #include "engine/game.h"
 #include "engine/debug_draw.h"
+#include "engine/defines.h"
+#include "engine/math.h"
+#include "engine/scene_manager.h"
 #include "engine/window.h"
-#include "engine/ui_manager.h"
 #include "ia/defines.h"
 
 #include <cstdio>
-#include "engine/math.h"
-
-Game::~Game()
-{
-    UIManager::instance().shutdown();
-}
 
 void Game::init() {
   UIManager::instance().init();
+  SceneManager::instance().createScenes();
 }
 
 void Game::start() {
@@ -67,13 +64,12 @@ void Game::start() {
       fps_time_acc = 0;
     }
   }
+  std::cout << "SALE" << std::endl;
 }
 
 void Game::shutdown() {
-  scenes_[curr_scene_]->shutdown();
-  for (uint8_t i = 0; i < SCENE_NUMBER; ++i) {
-    delete scenes_[i];
-  }
+    UIManager::instance().shutdown();
+    SceneManager::instance().shutdownScenes();
 }
 
 void Game::handleInput() {
@@ -83,22 +79,36 @@ void Game::handleInput() {
       quit_ = true;
     }
     if (e.type == SDL_MOUSEMOTION || e.type == SDL_MOUSEBUTTONDOWN || e.type == SDL_MOUSEBUTTONUP) {
-        scenes_[curr_scene_]->handleMouseEvent(e);
-    }    
+      int x, y;
+      SDL_GetMouseState(&x, &y);
+      SceneManager::instance().handleMouseEvent(e, x, y);
+    }
+
     if (e.type == SDL_KEYDOWN) {
       switch (e.key.keysym.sym) {
         case SDLK_ESCAPE: quit_ = true; break;
-        case SDLK_F1:   nextScene(-1); break;
-        case SDLK_F2:  nextScene(+1); break;
-        default:{}
+        case SDLK_F1:  SceneManager::instance().nextScene(-1); break;
+        case SDLK_F2:  SceneManager::instance().nextScene(+1); break;
+        case SDLK_F3:
+          slo_mo_ = clamp<int8_t>(++slo_mo_, 1, 10);
+          printf("Slow Motion Set To %d\n", slo_mo_);
+        break;
+        case SDLK_F4:
+          slo_mo_ = clamp<int8_t>(--slo_mo_, 1, 10);
+          printf("Slow Motion Set To %d\n", slo_mo_);
+        break;
+        case SDLK_F5:
+          DebugDraw::toggleEnabled();
+          printf("Debug Draw Mode Changed\n");
+        break;
+        default: SceneManager::instance().handleKeyEvent(e.key.keysym.sym);
       }
-      scenes_[curr_scene_]->handleKeyEvent(e.key.keysym.sym);
     }
   }
 }
 
 void Game::update(const uint32_t dt) {
-  scenes_[curr_scene_]->update(dt);
+  SceneManager::instance().update(dt / slo_mo_);
 }
 
 void Game::render() {
@@ -106,16 +116,9 @@ void Game::render() {
   SDL_SetRenderDrawColor(renderer, 0xD0, 0xD0, 0xD0, 0xFF);
   SDL_RenderClear(renderer);
 
-  scenes_[curr_scene_]->render();
+  SceneManager::instance().render();
   DebugDraw::render();
   UIManager::instance().render();
 
   SDL_RenderPresent(renderer);
-}
-
-void Game::nextScene(const int8_t sign) {
-  scenes_[curr_scene_]->shutdown();
-  curr_scene_ += sign;
-  curr_scene_ = clamp<int8_t>(curr_scene_, 0, SCENE_NUMBER - 1);
-  scenes_[curr_scene_]->init();
 }

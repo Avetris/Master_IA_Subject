@@ -18,7 +18,7 @@ class Texture {
 
     bool loadFromFile(const char* path);
     bool loadFromRenderedText(const char* textureText, const SDL_Color& textColor, TTF_Font* font, bool shadow = false, bool wrapped = false);
-    void free();
+    void freeTexture();
     void setColor(uint8_t red, uint8_t green, uint8_t blue) const;
     void setBlendMode(SDL_BlendMode blending) const;
     void setAlpha(uint8_t alpha) const;

@@ -7,10 +7,10 @@
 
 #include "engine/game.h"
 #include "engine/window.h""
-#include "ia/defines.h"
+#include "engine/defines.h"
 
 #include <ctime>
-#include <ia\scene_steering.h>
+#include <cstdlib>
 
 int main(int, char* []) {
   srand(time(NULL));
@@ -21,7 +21,6 @@ int main(int, char* []) {
     Game game;
 
     game.init();
-    game.attachScene<SceneSteering>();
     game.start();
     game.shutdown();
   }

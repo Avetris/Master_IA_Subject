@@ -10,34 +10,27 @@
 
 #include "engine/scene.h"
 #include "ia/defines.h"
+#include "engine/ui_manager.h"
 
 #include <SDL/SDL.h>
 
 class Game {
 	public:
 		Game() {};
-		~Game();
+		~Game() { UIManager::instance().shutdown();}
 
 		void init();
 		void start();
 		void shutdown();
-
-		template<typename T>
-		void attachScene() {
-			scenes_[0] = new T();
-			nextScene(0);
-		}
 	private:
 		void handleInput();
 		void update(uint32_t dt);
 		void render();
-		void nextScene(int8_t sign);
 
 		bool quit_ = false;
 		uint8_t fps_sprite_ = 0;
 
-		int8_t curr_scene_ = 0;
-		Scene* scenes_[SCENE_NUMBER];
+		int8_t slo_mo_ = 1;
 
 };
 

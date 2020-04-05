@@ -1,8 +1,10 @@
 #include "engine/game.h"
-#include "engine/window.h""
-#include "ia/defines.h"
+#include "engine/window.h"
+#include "engine/defines.h"
+#include <thread>
 
-#include <ia\scene_path.h>
+#include <ctime>
+#include <cstdlib>
 
 int main(int, char* []) {
     srand(time(NULL));
@@ -13,10 +15,10 @@ int main(int, char* []) {
         Game game;
 
         game.init();
-        game.attachScene<ScenePath>();
         game.start();
         game.shutdown();
     }
+
     Window::instance().shutdown();
 
     return 0;

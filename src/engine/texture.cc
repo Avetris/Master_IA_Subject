@@ -7,7 +7,7 @@
 
 #include "engine/texture.h"
 #include "engine/window.h"
-#include "ia/defines.h"
+#include "engine/defines.h"
 
 #include <cstdio>
 #include <SDL/SDL_image.h>
@@ -27,12 +27,12 @@ Texture::Texture() {
 }
 
 Texture::~Texture() {
-  free();
+    freeTexture();
 }
 
 bool Texture::loadFromFile(const char* path) {
   SDL_Renderer* renderer = Window::instance().getRenderer();
-  free();
+  freeTexture();
 
   SDL_Texture* newTexture = nullptr;
 
@@ -65,7 +65,7 @@ bool Texture::loadFromFile(const char* path) {
 
 bool Texture::loadFromRenderedText(const char* textureText, const SDL_Color& textColor, TTF_Font* font, const bool shadow, const bool wrapped) {
   SDL_Renderer* renderer = Window::instance().getRenderer();
-  free();
+  freeTexture();
 
   int shadowOffset = 1;
   if (TTF_FontHeight(font) > 40) {
@@ -129,7 +129,7 @@ bool Texture::loadFromRenderedText(const char* textureText, const SDL_Color& tex
   return texture_ != nullptr;
 }
 
-void Texture::free() {
+void Texture::freeTexture() {
   textureEnabled_ = false;
   if (texture_) {
     SDL_DestroyTexture(texture_);

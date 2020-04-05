@@ -6,6 +6,7 @@
 #include <engine\math.h>
 
 #include <SDL/SDL_ttf.h>
+#include <engine\defines.h>
 
 class UIManager {
   public:
@@ -20,15 +21,13 @@ class UIManager {
 
     void init();
     void render();
-    uint8_t addText(char* text, const uint32_t x = 0, const uint32_t y = 0);
+    void renderPath();
+    uint8_t addText(char* text, const uint32_t x = 0, const uint32_t y = 0, const bool isPoint = false);
     void setText(char* text, uint8_t uid);
     void setColor(uint8_t uid, const SDL_Color& textColor);
     void removeText(uint8_t uid);
-    void drawPath();
-    void setPath(std::vector<MathLib::Vec2> path)
-    {
-        _path = path;
-    }
+    void setPath(std::vector<MathLib::Vec2> path, float timeLast);
+    void setVisible(uint8_t uid, bool visible) { _spriteMap[uid].setVisible(visible); }
 
     void shutdown();
 
@@ -37,7 +36,9 @@ class UIManager {
 
     uint8_t _UID = 1;
     std::unordered_map<uint8_t, TextSprite> _spriteMap;
-    TTF_Font* font_ = nullptr;
+    TTF_Font* _font = nullptr;
+    TTF_Font* _fontPoint = nullptr;
+    uint8_t _pathUID = 0;
     std::vector<MathLib::Vec2> _path;
 };
 #endif

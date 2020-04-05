@@ -7,16 +7,13 @@
 
 #ifndef __WORLD_H__
 #define __WORLD_H__ 1
-
-#include "ia/defines.h"
+#include "agent.h"
 
 class World {
-  public:
-    World() {};
-    ~World() {};
-
-    virtual void update(const float dt) = 0;
-    virtual void render() const = 0;
+public:
+  virtual ~World() {};
+  virtual void update(uint32_t dt) = 0;
+  virtual void render() const = 0;
 };
 
 #endif
