@@ -64,7 +64,6 @@ void Game::start() {
       fps_time_acc = 0;
     }
   }
-  std::cout << "SALE" << std::endl;
 }
 
 void Game::shutdown() {
