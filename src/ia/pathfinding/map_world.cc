@@ -69,13 +69,13 @@ void MapWorld::debug()
 
 std::vector<t_coord> MapWorld::getInterestPositions(const Zone zone) const
 {
-    auto it = _interestNodes.find(zone);
-    if (it != _interestNodes.end()) {
-        return it->second;
+    if (_interestNodes.size() > 0) {
+        auto it = _interestNodes.find(zone);
+        if (it != _interestNodes.end()) {
+            return it->second;
+        }
     }
-    else {
-        return std::vector<t_coord>();
-    }
+    return std::vector<t_coord>();
 }
 
 void MapWorld::readMap()
@@ -102,14 +102,15 @@ void MapWorld::readMap()
                 switch (_map[j][i])
                 {
                 case Zone::Door:
+                {
                     if (d_pos.empty()) {
                         d_pos.push_back({ j, i });
                     }
                     else {
-                        t_coord n = { abs(d_pos.back().x) - j, abs(d_pos.back().y - i)};
+                        t_coord n = { abs(d_pos.back().x) - j, abs(d_pos.back().y - i) };
                         if (n.x > 1 || n.y > 1) {
                             Door d;
-                            MathLib::Vec2 c1 = {(float) d_pos[0].x * 8, (float) d_pos[0].y * 8};
+                            MathLib::Vec2 c1 = { (float)d_pos[0].x * 8, (float)d_pos[0].y * 8 };
                             MathLib::Vec2 c2 = { (float)d_pos.back().x * 8 + 8, (float)d_pos.back().y * 8 + 8 };
                             d.init(c1, c2);
                             doors.push_back(d);
@@ -120,7 +121,15 @@ void MapWorld::readMap()
                             d_pos.push_back({ j, i });
                         }
                     }
+                    std::vector<t_coord> vec;
+                    auto it = _interestNodes.find(Zone::Door);
+                    if (it != _interestNodes.end()) {
+                        vec = it->second;
+                    }
+                    vec.push_back({ j,i });
+                    _interestNodes[Zone::Door] = vec;
                     break;
+                }
                 case Zone::PathPoint:
                 case Zone::Base:
                 case Zone::WorkStart:
@@ -137,6 +146,74 @@ void MapWorld::readMap()
                         _interestNodes[_map[j][i]] = vec;
                     }
                     break;
+                case Zone::RestZone:
+                {
+                    std::vector<t_coord> vec;
+                    auto it = _interestNodes.find(Zone::RestZone);
+                    if (it != _interestNodes.end()) {
+                        vec = it->second;
+                    }
+                    vec.push_back({ j,i });
+                    _interestNodes[Zone::RestZone] = vec;
+                    break;
+                }
+                case Zone::OutdoorZone5:
+                case Zone::OutdoorZone7:
+                case Zone::OutdoorZone9:
+                case Zone::OutdoorZone11:
+                {
+                    std::vector<t_coord> vec;
+                    auto it = _interestNodes.find(Zone::OutdoorZone);
+                    if (it != _interestNodes.end()) {
+                        vec = it->second;
+                    }
+                    vec.push_back({ j,i });
+                    _interestNodes[Zone::OutdoorZone] = vec;
+                    break;
+                }
+                case Zone::FortressExitZone1:
+                case Zone::FortressExitZone2:
+                case Zone::FortressExitZone3:
+                case Zone::FortressExitZone4:
+                {
+                    std::vector<t_coord> vec;
+                    auto it = _interestNodes.find(Zone::FortressExitZone);
+                    if (it != _interestNodes.end()) {
+                        vec = it->second;
+                    }
+                    vec.push_back({ j,i });
+                    _interestNodes[Zone::FortressExitZone] = vec;
+                    break;
+                }
+                case Zone::FortressZone1:
+                case Zone::FortressZone2:
+                case Zone::FortressZone3:
+                case Zone::FortressZone4:
+                case Zone::FortressZone5:
+                case Zone::FortressZone6:
+                case Zone::FortressZone7:
+                case Zone::FortressWorkZone1:
+                case Zone::FortressWorkZone2:
+                case Zone::FortressWorkZone3:
+                case Zone::FortressWorkZone4:
+                case Zone::FortressWorkZone5:
+                case Zone::FortressWorkZone6:
+                case Zone::FortressWorkZone7:
+                case Zone::FortressWorkZone8:
+                case Zone::FortressWorkZone9:
+                case Zone::FortressWorkZone10:
+                case Zone::FortressWorkZone11:
+                case Zone::FortressWorkZone12:
+                {
+                    std::vector<t_coord> vec;
+                    auto it = _interestNodes.find(Zone::FortressZone);
+                    if (it != _interestNodes.end()) {
+                        vec = it->second;
+                    }
+                    vec.push_back({ j,i });
+                    _interestNodes[Zone::FortressZone] = vec;
+                    break;
+                }
                 default:
                     break;
                 } 
@@ -297,6 +374,22 @@ void MapWorld::initializeDoors(std::vector<Door> doors, std::vector<PointNode>* 
             std::reverse(path.begin(), path.end());
             pn2.pos = { middle.x + 1, middle.y };
             pn2.doorConnections = { {to, Zone::Door}, {from, Zone::Door} , {size + 1, size}, {middle.x + 1, middle.y}, distance, 2,path };
+
+
+            std::vector<t_coord> vecIn;
+            std::vector<t_coord> vecOut;
+            auto it = _interestNodes.find(Zone::DoorInPoint);
+            if (it != _interestNodes.end()) {
+                vecIn = it->second;
+            }
+            it = _interestNodes.find(Zone::DoorOutPoint);
+            if (it != _interestNodes.end()) {
+                vecOut = it->second;
+            }
+            vecOut.push_back({ middle.x - 1,middle.y });
+            vecIn.push_back({ middle.x + 1,middle.y });
+            _interestNodes[Zone::DoorInPoint] = vecIn;
+            _interestNodes[Zone::DoorOutPoint] = vecOut;
         }
         else {
             Zone from = _map[middle.x][middle.y - 1] = Zone::PathPoint;
@@ -314,6 +407,22 @@ void MapWorld::initializeDoors(std::vector<Door> doors, std::vector<PointNode>* 
             std::reverse(path.begin(), path.end());
             pn2.pos = { middle.x, middle.y + 1 };
             pn2.doorConnections = { {to, Zone::Door}, {from, Zone::Door} , {size + 1, size}, {middle.x, middle.y + 1}, distance, 2,path };
+
+
+            std::vector<t_coord> vecIn;
+            std::vector<t_coord> vecOut;
+            auto it = _interestNodes.find(Zone::DoorInPoint);
+            if (it != _interestNodes.end()) {
+                vecIn = it->second;
+            }
+            it = _interestNodes.find(Zone::DoorOutPoint);
+            if (it != _interestNodes.end()) {
+                vecOut = it->second;
+            }
+            vecOut.push_back({ middle.x,middle.y - 1 });
+            vecIn.push_back({ middle.x,middle.y + 1 });
+            _interestNodes[Zone::DoorInPoint] = vecIn;
+            _interestNodes[Zone::DoorOutPoint] = vecOut;
         }
         nodes->push_back(pn1);
         nodes->push_back(pn2);
@@ -353,4 +462,10 @@ void MapWorld::initializeZones(std::vector<PointNode> nodes)
         _pointNodes[i].zones = zones;
         zones.clear();
     }
+}
+
+long MapWorld::getDistance(const t_coord c1, const t_coord c2) const {
+    int x = abs(c1.x - c2.x);
+    int y = abs(c1.y - c2.y);
+    return (x * x) + (y * y);
 }

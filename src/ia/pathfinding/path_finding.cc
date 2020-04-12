@@ -11,12 +11,12 @@
 #include <ia\pathfinding\binary_heap.h>
 #include <chrono>
 
-PathFinding::PathFinding(MapWorld* world, t_coord startPos, t_coord endPos, Mind* target, bool draw, PathType type, AgentType agentType) 
+PathFinding::PathFinding(MapWorld* world, t_coord startPos, t_coord endPos, Agent* target, bool draw, PathType type, AgentType agentType) 
     : _world(world), _target(target), _type(type), _draw(draw), _agentType(agentType){
-    _startPos.x = round(startPos.x / 8);
-    _startPos.y = round(startPos.y / 8);
-    _goalPos.x = round(endPos.x / 8);
-    _goalPos.y = round(endPos.y / 8);
+    _startPos.x = round(startPos.x);
+    _startPos.y = round(startPos.y);
+    _goalPos.x = round(endPos.x);
+    _goalPos.y = round(endPos.y);
 }
 
 void PathFinding::init(uint8_t map[MAP_L1_WIDTH][MAP_L1_HEIGHT], PointConnection* pointNodesMatrix, uint8_t numPointNodes) {
@@ -40,6 +40,24 @@ void PathFinding::init(uint8_t map[MAP_L1_WIDTH][MAP_L1_HEIGHT], PointConnection
         }
     }
     _numPointNodes = numPointNodes;
+    if (_target && (_startPos.x == -1 || _startPos.y == -1)) {
+        if (_target->getMind()->_pathTarget && 
+            _target->getMind()->_pathTarget->pathFound &&
+            _target->getMind()->_pathTarget->index < _target->getMind()->_pathTarget->path.size() - 1) {
+            MathLib::Vec2 vec = _target->getMind()->_pathTarget->path[_target->getMind()->_pathTarget->index + 1];
+            _startPos = {
+                (int)round(vec.x() / 8),
+                (int)round(vec.y() / 8)
+            };
+
+        }
+        else {
+            _startPos = {
+                (int)round(_target->getKinematic()->position.x() / 8),
+                (int)round(_target->getKinematic()->position.y() / 8)
+            };
+        }
+    }
     if (_type == PathType::A_Pre_Manhattan) {
         _startZone = _world->getZoneMap(_startPos.x, _startPos.y);
         _goalZone = _world->getZoneMap(_goalPos.x, _goalPos.y);
@@ -88,7 +106,7 @@ void PathFinding::init(uint8_t map[MAP_L1_WIDTH][MAP_L1_HEIGHT], PointConnection
             _startPoints.clear();
             _startPoints.push_back(same);
         }
-    }
+    }   
 
 }
 
@@ -96,67 +114,70 @@ void PathFinding::findPath() {
     auto firstTime = std::chrono::high_resolution_clock::now();
     auto finishTime = std::chrono::high_resolution_clock::now();
     std::vector<Vec2> path;
-    if (_type == PathType::A_Pre_Manhattan) {
-        t_coord st = _startPos;
-        t_coord gl = _goalPos;
-        bool sameZone = _startZone == _goalZone;
-        if (!sameZone) {
-            path = findPointPath();
-        }
-
-        if (path.size() > 0 || sameZone) {
-            if (sameZone || (st.x != path[0].x() / 8 && st.y != path[0].y() / 8)) {
-                if (!sameZone) {
-                    _startPos = st;
-                    _goalPos = { (int)path[0].x() / 8, (int)path[0].y() / 8 };
-                }
-                findAlgorithm();
-                while (_bestNode) {
-                    path.insert(path.begin(), { (float)_bestNode->position.x * 8, (float)_bestNode->position.y * 8 });
-                    if (_bestNode->position == _startPos) {
-                        _bestNode = nullptr;
-                    }
-                    else {
-                        _bestNode = &_nodes[_bestNode->parent.x][_bestNode->parent.y];
-                    }
-                }
-                _bestNode = nullptr;
+    t_coord st = _startPos;
+    t_coord gl = _goalPos;
+    if (st.x != gl.x || gl.y != st.y) {
+        if (_type == PathType::A_Pre_Manhattan) {
+            bool sameZone = _startZone == _goalZone;
+            if (!sameZone) {
+                path = findPointPath();
             }
-            if (!sameZone && gl.x != path.back().x() / 8 && gl.y != path.back().y() / 8) {
-                _startPos = { (int) path.back().x() / 8, (int) path.back().y() / 8 };
-                _goalPos = gl;
-                findAlgorithm();
-                std::vector<Vec2> path2;
-                while (_bestNode) {
-                    path2.insert(path2.begin(), { (float)_bestNode->position.x * 8, (float)_bestNode->position.y * 8 });
-                    if (_bestNode->position == _startPos) {
-                        _bestNode = nullptr;
-                    }
-                    else {
-                        _bestNode = &_nodes[_bestNode->parent.x][_bestNode->parent.y];
-                    }
-                }
-                path.insert(path.end(), path2.begin(), path2.end());
 
+            if (path.size() > 0 || sameZone) {
+                if (sameZone || st.x != path[0].x() / 8 || st.y != path[0].y() / 8) {
+                    if (!sameZone) {
+                        _startPos = st;
+                        _goalPos = { (int)path[0].x() / 8, (int)path[0].y() / 8 };
+                    }
+                    findAlgorithm();
+                    while (_bestNode) {
+                        path.insert(path.begin(), { (float)_bestNode->position.x * 8, (float)_bestNode->position.y * 8 });
+                        if (_bestNode->position == _startPos) {
+                            _bestNode = nullptr;
+                        }
+                        else {
+                            _bestNode = &_nodes[_bestNode->parent.x][_bestNode->parent.y];
+                        }
+                    }
+                    _bestNode = nullptr;
+                }
+                int x = (int)path.back().x() / 8;
+                int y = (int)path.back().y() / 8;
+                if (!sameZone && (gl.x != x || gl.y != y)) {
+                    _startPos = { x, y };
+                    _goalPos = gl;
+                    findAlgorithm();
+                    std::vector<Vec2> path2;
+                    while (_bestNode) {
+                        path2.insert(path2.begin(), { (float)_bestNode->position.x * 8, (float)_bestNode->position.y * 8 });
+                        if (_bestNode->position == _startPos) {
+                            _bestNode = nullptr;
+                        }
+                        else {
+                            _bestNode = &_nodes[_bestNode->parent.x][_bestNode->parent.y];
+                        }
+                    }
+                    path.insert(path.end(), path2.begin(), path2.end());
+
+                }
             }
+            finishTime = std::chrono::high_resolution_clock::now();
         }
-        finishTime = std::chrono::high_resolution_clock::now();
+        else {
+            findAlgorithm();
+            while (_bestNode) {
+                path.insert(path.begin(), { (float)_bestNode->position.x * 8, (float)_bestNode->position.y * 8 });
+                if (_bestNode->position == _startPos) {
+                    _bestNode = nullptr;
+                }
+                else {
+                    _bestNode = &_nodes[_bestNode->parent.x][_bestNode->parent.y];
+                }
+            }
+
+            finishTime = std::chrono::high_resolution_clock::now();
+        }
     }
-    else {
-        findAlgorithm();
-        while (_bestNode) {
-            path.insert(path.begin(), { (float)_bestNode->position.x * 8, (float)_bestNode->position.y * 8 });
-            if (_bestNode->position == _startPos) {
-                _bestNode = nullptr;
-            }
-            else {
-                _bestNode = &_nodes[_bestNode->parent.x][_bestNode->parent.y];
-            }
-        }
-
-        finishTime = std::chrono::high_resolution_clock::now();
-    }
-
     
     long currentTime = std::chrono::duration_cast<std::chrono::microseconds>(finishTime - firstTime).count();
 
@@ -170,7 +191,7 @@ void PathFinding::findPath() {
         _draw
     };
     if(_target)
-        static_cast<MindPathFinding*>(_target)->setTargetPath(_pathFound);
+        _target->getMind()->setTargetPath(_pathFound);
 }
 
 void PathFinding::findAlgorithm()
@@ -255,7 +276,8 @@ std::vector<Vec2> PathFinding::findPointPath()
                     if (ppc->G > 0 && ppc->isOpenClosed != 1 && (ppc->F == 0 || ppc->F > cost)) {
                         ppc->F = cost;
                         ppc->parent = { closingVertex->pos.x, closingVertex->pos.y };
-                        if (std::count(ppc->nextZones.begin(), ppc->nextZones.end(), _goalZone)) {
+                        if (std::count(ppc->nextZones.begin(), ppc->nextZones.end(), _goalZone) 
+                            && (!_bestPointNode || _bestPointNode->F > ppc->F)) {
                             _bestPointNode = ppc;
                         }
                         else {
@@ -284,8 +306,8 @@ bool PathFinding::getNearNodes(t_coord parent, PathNode** nodeArray)
 {
     bool enter = false;
     int pos = 0;
-    for (uint8_t x = parent.x - 1; x < parent.x + 2; x++) {
-        for (uint8_t y = parent.y - 1; y < parent.y + 2; y++) {
+    for (uint8_t x = parent.x - 1 >= 0 ? parent.x - 1 : 0; x < parent.x + 2; x++) {
+        for (uint8_t y = parent.y - 1 >= 0 ? parent.y - 1 : 0; y < parent.y + 2; y++) {
             t_coord node = { x,y };
             if(node != parent){
                 if (node != _startPos &&

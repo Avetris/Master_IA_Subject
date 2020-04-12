@@ -39,9 +39,9 @@ void UIManager::renderPath()
     }
 }
 
-uint8_t UIManager::addText(char* text, const uint32_t x, const uint32_t y, const bool isPoint)
+uint32_t UIManager::addText(char* text, const uint32_t x, const uint32_t y, const bool isPoint)
 {
-    uint8_t uid = _UID++;
+    uint32_t uid = _UID++;
     TextSprite sprite;
     sprite.setPositionUpLeft(x, y);
     _spriteMap.insert({ uid, sprite });
@@ -50,22 +50,23 @@ uint8_t UIManager::addText(char* text, const uint32_t x, const uint32_t y, const
         _spriteMap[uid].setVisible(false);
     }else{
         _spriteMap[uid].loadText(text, SDL_Color FOREGROUND_COLOR, _font, true);
-        _spriteMap[uid].setVisible(true);    }
+        _spriteMap[uid].setVisible(true);    
+    }
 
     return uid;
 }
 
-void UIManager::setText(char* text, uint8_t uid)
+void UIManager::setText(char* text, uint32_t uid)
 {
     _spriteMap[uid].setText(text);
 }
 
-void UIManager::setColor(uint8_t uid, const SDL_Color& textColor)
+void UIManager::setColor(uint32_t uid, const SDL_Color& textColor)
 {
     _spriteMap[uid].setTextColor(textColor);
 }
 
-void UIManager::removeText(uint8_t uid)
+void UIManager::removeText(uint32_t uid)
 {
     _spriteMap.erase(uid);
 }
@@ -91,4 +92,23 @@ void UIManager::setPath(std::vector<MathLib::Vec2> path, float timeLast)
     else {
         _pathUID = UIManager::instance().addText(text, WINDOW_WIDTH / 2, 0);
     }
+}
+
+uint32_t UIManager::addAlarm()
+{
+    uint32_t uid = _UID++;
+    TextSprite sprite;
+    sprite.setPositionUpLeft(160, 60);
+    _spriteMap.insert({ uid, sprite });
+    TTF_Font* f = TTF_OpenFont(FONT_FILE, 300);
+    if (!f) {
+        printf("Failed to load font! SDL_ttf Error: %s\n", TTF_GetError());
+    }
+    else {
+        _spriteMap[uid].loadText("ALARM", SDL_Color ACTIVE_COLOR, f, true);
+        _spriteMap[uid].setVisible(false);
+    }
+
+
+    return uid;
 }

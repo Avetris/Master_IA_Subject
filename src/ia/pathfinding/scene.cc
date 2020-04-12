@@ -7,40 +7,55 @@
 
 void ScenePath::init() {
   printf("Path Scene Is Being Initialized\n");
-  _background.loadFromFile(MAP_PATH);
-  const uint32_t y = WINDOW_HEIGHT - 20;
-  std::string str = "";
-  int i = 0;
-  while (i < _world.getNumDoors()) {
-      str += std::to_string(i++);
+  if (!_loaded) {
+      _background.loadFromFile(MAP_PATH);
   }
-  str += " Doors";
-  UIManager::instance().addText(const_cast<char*>(str.c_str()), 10, y);
-  str = std::to_string(i++) + " Dijkstra";
-  char* cstr = new char[str.length() + 1];
-  strcpy(cstr, str.c_str());
-  _typeSpriteMap.insert({ PathType::Dijkstra, UIManager::instance().addText(cstr, 160, y) });
-  str = std::to_string(i++) + " A* Manhattan";
-  cstr = new char[str.length() + 1];
-  strcpy(cstr, str.c_str());
-  _typeSpriteMap.insert({ PathType::A_Manhattan, UIManager::instance().addText(cstr, 300, y) });
-  str = std::to_string(i++) + " A* Diagonal";
-  cstr = new char[str.length() + 1];
-  strcpy(cstr, str.c_str());
-  _typeSpriteMap.insert({ PathType::A_Diagonal, UIManager::instance().addText(cstr, 500, y) });
-  str = std::to_string(i++) + " A* Euclidean";
-  cstr = new char[str.length() + 1];
-  strcpy(cstr, str.c_str());
-  _typeSpriteMap.insert({ PathType::A_Euclidean, UIManager::instance().addText(cstr, 675, y) });
-  str = std::to_string(i++) + " A* Pre Man";
-  cstr = new char[str.length() + 1];
-  strcpy(cstr, str.c_str());
-  _typeSpriteMap.insert({ PathType::A_Pre_Manhattan, UIManager::instance().addText(cstr, 875, y) });
-   UIManager::instance().setColor(_typeSpriteMap[PathType::Dijkstra], SDL_Color ACTIVE_COLOR);
+  initText();
+  _loaded = true;
+}
+void ScenePath::initText() {
+    const uint32_t y = WINDOW_HEIGHT - 20;
+    std::string str = "";
+    int i = 0;
+    while (i < _world.getNumDoors()) {
+        str += std::to_string(i++);
+    }
+    str += " Doors";
+    _sprites.push_back(UIManager::instance().addText(const_cast<char*>(str.c_str()), 10, y));
+    str = std::to_string(i++) + " Dijkstra";
+    char* cstr = new char[str.length() + 1];
+    strcpy(cstr, str.c_str());
+    _typeSpriteMap.insert({ PathType::Dijkstra, UIManager::instance().addText(cstr, 160, y) });
+    str = std::to_string(i++) + " A* Manhattan";
+    cstr = new char[str.length() + 1];
+    strcpy(cstr, str.c_str());
+    _typeSpriteMap.insert({ PathType::A_Manhattan, UIManager::instance().addText(cstr, 300, y) });
+    str = std::to_string(i++) + " A* Diagonal";
+    cstr = new char[str.length() + 1];
+    strcpy(cstr, str.c_str());
+    _typeSpriteMap.insert({ PathType::A_Diagonal, UIManager::instance().addText(cstr, 500, y) });
+    str = std::to_string(i++) + " A* Euclidean";
+    cstr = new char[str.length() + 1];
+    strcpy(cstr, str.c_str());
+    _typeSpriteMap.insert({ PathType::A_Euclidean, UIManager::instance().addText(cstr, 675, y) });
+    str = std::to_string(i++) + " A* Pre Man";
+    cstr = new char[str.length() + 1];
+    strcpy(cstr, str.c_str());
+    _typeSpriteMap.insert({ PathType::A_Pre_Manhattan, UIManager::instance().addText(cstr, 875, y) });
+    UIManager::instance().setColor(_typeSpriteMap[PathType::Dijkstra], SDL_Color ACTIVE_COLOR);
 }
 
 void ScenePath::shutdown() {
   printf("Path Scene Has Been Shutdown\n");
+  PathManager::instance().reset();
+  for (auto v : _typeSpriteMap) {
+      UIManager::instance().removeText(v.second);
+  }
+  for (uint32_t uid : _sprites) {
+      UIManager::instance().removeText(uid);
+  }
+  _typeSpriteMap.clear();
+  _sprites.clear();
 }
 
 void ScenePath::update(const uint32_t dt) {
@@ -50,10 +65,10 @@ void ScenePath::update(const uint32_t dt) {
 void ScenePath::handleMouseEvent(SDL_Event e, int x, int y) {
     if (e.type == SDL_MOUSEBUTTONUP) {
         if (_fristClick.x == -1 || _fristClick.y == -1) {
-            _fristClick = { x,y };
+            _fristClick = { x / 8, y / 8 };
         }
         else {
-            PathManager::instance().addPath(_fristClick, { x,y }, _world.getIA()->getMind(), AgentType::Slave, true, _type);
+            PathManager::instance().addPath(_fristClick, { x / 8, y / 8 }, _world.getIA(), AgentType::Slave, true, _type);
             _fristClick = { -1, -1 };
         }
     }

@@ -6,22 +6,20 @@
 //----------------------------------------------------------------------------
 
 #ifndef __AGENT_H__
-#define __AGENT_H__ 11
+#define __AGENT_H__ 1
 
 #include "ia/defines.h"
 
 #include <cstdint>
 #include "steering/body.h"
-#include <ia/mind.h>
+#include "steering/mind.h"
 
 class World;
 
 class Agent {
   public:
-    World* _world = nullptr;
-    uint32_t _UID;
     Agent() = default;
-    Agent(World* world, Color color, Type type, BodyType bodyType, MindType mindType, MathLib::Vec2 position = MathLib::Vec2(-1, -1));
+    Agent(World* world, Color color, Type type, BodyType bodyType, MindType mindType);
     ~Agent();
 
     Agent(const Agent&) = default;
@@ -39,9 +37,11 @@ class Agent {
     Mind* getMind() {return _mind.get();}
 
   private:
-    static uint32_t _GUID;
+    static uint16_t _GUID;
+    World * _world = nullptr;
 
     std::unique_ptr<Body> _body;
     std::unique_ptr<Mind> _mind;
 };
+
 #endif

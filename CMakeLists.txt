@@ -59,7 +59,8 @@ set(ENGINE_HEADER_FILES
   ${CMAKE_CURRENT_LIST_DIR}/include/engine/window.h)
 
 set(IA_SRC_FILES
-  ${CMAKE_CURRENT_LIST_DIR}/src/ia/agent.cc)
+  ${CMAKE_CURRENT_LIST_DIR}/src/ia/agent.cc
+  ${CMAKE_CURRENT_LIST_DIR}/src/ia/door.cc)
 
 set(IA_HEADER_FILES
   ${CMAKE_CURRENT_LIST_DIR}/include/ia/agent.h
@@ -67,6 +68,7 @@ set(IA_HEADER_FILES
   ${CMAKE_CURRENT_LIST_DIR}/include/ia/defines.h
   ${CMAKE_CURRENT_LIST_DIR}/include/ia/mind.h
   ${CMAKE_CURRENT_LIST_DIR}/include/ia/world.h
+  ${CMAKE_CURRENT_LIST_DIR}/include/ia/door.h
   ${CMAKE_CURRENT_LIST_DIR}/include/ia/movement/movement.h
   ${CMAKE_CURRENT_LIST_DIR}/include/ia/movement/kinematic/kinematicarrive.h
   ${CMAKE_CURRENT_LIST_DIR}/include/ia/movement/kinematic/kinematicflee.h
@@ -116,14 +118,44 @@ set(IA_PATHFINDING_SRC_FILES
   ${CMAKE_CURRENT_LIST_DIR}/src/ia/pathfinding/scene.cc
 )
 
+
+set(IA_FINAL_HEADER_FILES
+  ${CMAKE_CURRENT_LIST_DIR}/include/ia/final/body.h
+  ${CMAKE_CURRENT_LIST_DIR}/include/ia/final/mind.h
+  ${CMAKE_CURRENT_LIST_DIR}/include/ia/final/mind_slave.h
+  ${CMAKE_CURRENT_LIST_DIR}/include/ia/final/mind_guard.h
+  ${CMAKE_CURRENT_LIST_DIR}/include/ia/final/mind_soldier.h
+  ${CMAKE_CURRENT_LIST_DIR}/include/ia/final/message_manager.h
+  ${CMAKE_CURRENT_LIST_DIR}/include/ia/final/agent_manager.h
+  ${CMAKE_CURRENT_LIST_DIR}/include/ia/final/slave_manager.h
+  ${CMAKE_CURRENT_LIST_DIR}/include/ia/final/guard_manager.h
+  ${CMAKE_CURRENT_LIST_DIR}/include/ia/final/soldier_manager.h
+  ${CMAKE_CURRENT_LIST_DIR}/include/ia/final/scene.h
+  ${CMAKE_CURRENT_LIST_DIR}/include/ia/final/world.h
+)
+
+set(IA_FINAL_SRC_FILES
+  ${CMAKE_CURRENT_LIST_DIR}/src/ia/final/world.cc
+  ${CMAKE_CURRENT_LIST_DIR}/src/ia/final/body.cc
+  ${CMAKE_CURRENT_LIST_DIR}/src/ia/final/mind.cc
+  ${CMAKE_CURRENT_LIST_DIR}/src/ia/final/mind_slave.cc
+  ${CMAKE_CURRENT_LIST_DIR}/src/ia/final/mind_guard.cc
+  ${CMAKE_CURRENT_LIST_DIR}/src/ia/final/mind_soldier.cc
+  ${CMAKE_CURRENT_LIST_DIR}/src/ia/final/agent_manager.cc
+  ${CMAKE_CURRENT_LIST_DIR}/src/ia/final/slave_manager.cc
+  ${CMAKE_CURRENT_LIST_DIR}/src/ia/final/guard_manager.cc
+  ${CMAKE_CURRENT_LIST_DIR}/src/ia/final/soldier_manager.cc
+  ${CMAKE_CURRENT_LIST_DIR}/src/ia/final/scene.cc
+)
+
 source_group(TREE ${CMAKE_CURRENT_SOURCE_DIR}/src
   PREFIX "Source Files"
   FILES ${NET_SRC_FILES} ${MATHLIB_SRC_FILES} ${ENGINE_SRC_FILES}
-    ${IA_SRC_FILES} ${IA_STEERING_SRC_FILES} ${IA_PATHFINDING_SRC_FILES})
+    ${IA_SRC_FILES} ${IA_STEERING_SRC_FILES} ${IA_PATHFINDING_SRC_FILES}${IA_FINAL_SRC_FILES})
 source_group(TREE ${CMAKE_CURRENT_SOURCE_DIR}/include
   PREFIX "Header Files"
   FILES ${CONTAINERS_HEADER_FILES} ${NET_HEADER_FILES} ${MATHLIB_HEADER_FILES} ${ENGINE_HEADER_FILES}
-    ${IA_HEADER_FILES} ${IA_STEERING_HEADER_FILES} ${IA_PATHFINDING_HEADER_FILES})
+    ${IA_HEADER_FILES} ${IA_STEERING_HEADER_FILES} ${IA_PATHFINDING_HEADER_FILES}${IA_FINAL_HEADER_FILES})
 
 #****************************************************
 # AG01 - Multithreading
@@ -203,7 +235,7 @@ foreach(PROJECT ${IA_PROJECTS})
   project_for_ia(${PROJECT})
 endforeach()
 
-target_sources(AG03 PRIVATE ${IA_STEERING_SRC_FILES} ${IA_STEERING_HEADER_FILES} ${IA_PATHFINDING_HEADER_FILES} ${IA_PATHFINDING_SRC_FILES})
-target_sources(OPT01 PRIVATE ${IA_STEERING_SRC_FILES} ${IA_STEERING_HEADER_FILES} ${IA_PATHFINDING_HEADER_FILES} ${IA_PATHFINDING_SRC_FILES})
-target_sources(ACT03 PRIVATE ${IA_STEERING_SRC_FILES} ${IA_STEERING_HEADER_FILES} ${IA_PATHFINDING_HEADER_FILES} ${IA_PATHFINDING_SRC_FILES})
-target_sources(ACT04 PRIVATE "")
+target_sources(AG03 PRIVATE ${IA_STEERING_SRC_FILES} ${IA_STEERING_HEADER_FILES} ${IA_PATHFINDING_HEADER_FILES} ${IA_PATHFINDING_SRC_FILES} ${IA_FINAL_HEADER_FILES} ${IA_FINAL_SRC_FILES})
+target_sources(OPT01 PRIVATE ${IA_STEERING_SRC_FILES} ${IA_STEERING_HEADER_FILES} ${IA_PATHFINDING_HEADER_FILES} ${IA_PATHFINDING_SRC_FILES} ${IA_FINAL_HEADER_FILES} ${IA_FINAL_SRC_FILES})
+target_sources(ACT03 PRIVATE ${IA_STEERING_SRC_FILES} ${IA_STEERING_HEADER_FILES} ${IA_PATHFINDING_HEADER_FILES} ${IA_PATHFINDING_SRC_FILES} ${IA_FINAL_HEADER_FILES} ${IA_FINAL_SRC_FILES})
+target_sources(ACT04 PRIVATE ${IA_STEERING_SRC_FILES} ${IA_STEERING_HEADER_FILES} ${IA_PATHFINDING_HEADER_FILES} ${IA_PATHFINDING_SRC_FILES} ${IA_FINAL_HEADER_FILES} ${IA_FINAL_SRC_FILES})

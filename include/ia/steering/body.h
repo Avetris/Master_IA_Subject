@@ -25,7 +25,6 @@ class BodySteering: public Body {
     void render() const;
 
     void setTarget(Agent* target);
-    void setSteering(const SteeringMode mode);
     
   private:
     void updateAutomatic(uint32_t dt, const Steering& steering);

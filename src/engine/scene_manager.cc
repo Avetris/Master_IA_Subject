@@ -9,13 +9,14 @@
 #include "engine/math.h"
 #include "ia/steering/scene.h"
 #include "ia/pathfinding/scene.h"
+#include "ia/final/scene.h"
 
 void SceneManager::createScenes() {
   _scenes[0] = new SceneSteering();
   _scenes[1] = new ScenePath();
-  //_scenes[2] = new SceneSteering();
+  _scenes[2] = new SceneFinal();
   //_scenes[3] = new SceneSteering();
-  nextScene(1);
+  nextScene(2);
 }
 
 void SceneManager::shutdownScenes() {

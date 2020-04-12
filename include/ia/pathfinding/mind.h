@@ -5,18 +5,18 @@
 
 class MindPathFinding: public Mind {
     public:
-         MindPathFinding(World* world, Body* body);
+         MindPathFinding(Agent* agent, Body* body);
         ~MindPathFinding() {};
 
         void update(uint32_t dt) final;
 
-        void setTargetPath(Path path);
+        void setTargetPath(Path path) final;
 
         void checkDoor(Door* door);
 
     private:
         std::unique_ptr<Path> _pathTarget;
-        std::unique_ptr<Path> _nextTarget = nullptr;
+        std::unique_ptr<Path> _nextTarget;
 
 };
 

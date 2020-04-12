@@ -14,7 +14,7 @@ class KinematicWander : public Movement {
   public:
     KinematicWander() {}
     ~KinematicWander() {}
-
+    
     void calculate(const KinematicStatus& character, const KinematicStatus*, Steering* steering) override {
         MathLib::Vec2 orientation;
         //orientation of character as vector
@@ -24,5 +24,6 @@ class KinematicWander : public Movement {
         //rotate to random (binomial distribution around 0)
         steering->rotation_angular = max_rotation_ * (randomFloat(0.0f, 1.0f) - randomFloat(0.0f, 1.0f));
     } 
+
 };
 #endif

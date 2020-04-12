@@ -13,12 +13,13 @@
 #include <ia\door.h>
 
 class Body;
-class World;
+class Agent;
 
 class Mind {
 public:
-  Mind(World* world, Body* body) : _world(world), _body(body) {};
-  virtual ~Mind() { _world = nullptr; _body = nullptr; };
+    std::unique_ptr<Path> _pathTarget = nullptr;
+  Mind(Agent* agent, Body* body) : _agent(agent), _body(body) {};
+  virtual ~Mind() { _agent = nullptr; _body = nullptr; };
 
   Mind(const Mind&) = default;
   Mind(Mind&&) noexcept = default;
@@ -26,8 +27,9 @@ public:
   Mind& operator=(Mind&&) noexcept = default;
 
   virtual void update(uint32_t dt) = 0;
+  virtual void setTargetPath(Path path) {}
 protected:
-  World* _world = nullptr;
+  Agent* _agent = nullptr;
   Body*_body = nullptr;
 };
 

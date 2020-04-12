@@ -12,7 +12,7 @@
 
 class MindSteering: public Mind {
   public:
-    MindSteering(World* world, Body* body);
+    MindSteering(Agent* agent, Body* body);
     ~MindSteering() {};
 
     void update(uint32_t dt) final;

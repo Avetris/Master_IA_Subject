@@ -16,7 +16,7 @@ BodyPathFinding::BodyPathFinding(const Color color) {
     case Color::Red: _sprite.loadFromFile(AGENT_RED_PATH); break;
     default: _sprite.loadFromFile(AGENT_GREEN_PATH);
     }
-    _movement = std::make_unique<KinematicArrive>();
+    setSteering(SteeringMode::Kinematic_Arrive);
 }
 
 void BodyPathFinding::update(const uint32_t dt) {
@@ -86,8 +86,8 @@ void BodyPathFinding::updateAutomatic(const uint32_t dt, const Steering& steerin
         _state.rotation += steering.rotation_angular;
     }
 
-    _state.position += steering.velocity_linear * time;
-    _state.orientation += steering.rotation_angular * time;
+    _state.position += _state.velocity * time;
+    _state.orientation += _state.rotation * time;
 
     if (!_isKinematic) keepInSpeed();
     keepInBounds();

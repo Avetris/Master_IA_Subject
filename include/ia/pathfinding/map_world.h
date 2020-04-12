@@ -27,9 +27,16 @@ class MapWorld: public World {
     void debug();
 
     std::vector<t_coord> getInterestPositions(const Zone zone) const;
-    Zone getZoneMap(int x, int y) { return _map[x][y]; }
-    Zone getZoneMap8(int x, int y) { return _map[x / 8][y / 8]; }
+    Zone getZoneMap(int x, int y) { 
+        if (x >= MAP_L2_WIDTH || x < 0) {
+            return Zone::Wall;
+        }else if (y >= MAP_L2_HEIGHT || y < 0) {
+            return Zone::Wall;
+        }
+        return _map[x][y]; 
+    }
 
+    long getDistance(const t_coord c1, const t_coord c2) const;
 
 protected:
     Zone _map[MAP_L2_WIDTH][MAP_L2_HEIGHT];

@@ -15,14 +15,52 @@
 #define AGENT_RED_PATH "../assets/images/agent_red.png"
 #define AGENT_GREEN_PATH "../assets/images/agent_green.png"
 #define AGENT_PURPLE_PATH "../assets/images/agent_purple.png"
+#define AGENT_SLAVE_PATH "../assets/images/slave.bmp"
+#define AGENT_GUARD_PATH "../assets/images/guard.bmp"
+#define AGENT_SOLDIER_PATH "../assets/images/soldier.bmp"
 
 #define MAP_PATH "../assets/images/mapa.bmp"
 #define ZONES_PATH "../assets/images/zonas_min.bmp"
 
+#define DISTANCE_SHOW 60
+#define DISTANCE_CHASE 10
+#define DISTANCE_ACTION 4
+#define TIME_ALARM 8
+#define TIME_DECISSION_SLAVE 30
+#define TIME_DECISSION_SOLDIER 15
+#define N_AGENTS_MODIFY 10
+
+enum class State {
+    Idle,
+    M_Waiting,
+    M_Finding_Door,
+    M_Action_Door,
+    M_Going_Base,
+    M_Resting,
+    M_Going_Rest,
+    M_Going_Work,
+    M_Working,
+    M_Working_Back,
+    M_Chasing,
+    M_Arrested,
+    M_In_Base,
+    M_Patroling,
+
+    B_Wander,
+    B_Waiting,
+    B_Pathing,
+    B_Pathing_Slow,
+    B_Chasing,
+    B_Stopped,
+};
+
 enum class Zone {
     Wall = 0,
     Door = 255000000,
+    DoorInPoint,
+    DoorOutPoint,
     RestZone = 255000,
+    OutdoorZone,
     OutdoorZone1 = 255,
     OutdoorZone2 = 240,
     OutdoorZone3 = 230,
@@ -35,6 +73,8 @@ enum class Zone {
     OutdoorZone10 = 160,
     OutdoorZone11 = 150,
     OutdoorZone12 = 140,
+    OutdoorZone13 = 130,
+    FortressZone,
     FortressZone1 = 255240,
     FortressZone2 = 255230,
     FortressZone3 = 255220,
@@ -42,6 +82,7 @@ enum class Zone {
     FortressZone5 = 255200,
     FortressZone6 = 255190,
     FortressZone7 = 255180,
+    FortressExitZone,
     FortressExitZone1 = 240255,
     FortressExitZone2 = 230255,
     FortressExitZone3 = 220255,
@@ -65,12 +106,14 @@ enum class Zone {
     PathPoint = 255255255
 };
 
-
 enum class Color {
   Green,
   Blue,
   Purple,
   Red,
+  Slave,
+  Guard,
+  Soldier,
 };
 
 enum class Type {
@@ -81,13 +124,17 @@ enum class Type {
 enum class BodyType {
   Steering,
   Pathfinding,
-  Flocking
+  Flocking,
+  Final
 };
 
 enum class MindType {
   Steering,
   Pathfinding,
-  Flocking
+  Flocking,
+  Slave,
+  Guard,
+  Soldier,
 };
 
 enum class SteeringMode {
@@ -115,7 +162,10 @@ enum class AgentType {
     NoAgent,
     Slave,
     Guard,
-    Soldier
+    Soldier,
+    SlaveManager,
+    GuardManager,
+    SoldierManager
 };
 
 enum NodeType {
@@ -143,17 +193,7 @@ struct Steering {
   float rotation_angular{ 0.0f };                //rotation / angular acceleration
 };
 
-struct KinematicStatus {
-  MathLib::Vec2 position{ 0.0f, 0.0f };
-  float orientation {0.0f};
-  bool needsToOrientate = true;
-  MathLib::Vec2 velocity{ 0.0f, 0.0f };  //linear velocity
-  float rotation{0.0f};               //angular velocity
-
-  float speed{ 0.0f };
-};
-
-struct t_coord{
+struct t_coord {
     int x;
     int y;
 
@@ -166,6 +206,17 @@ struct t_coord{
         return x != other.x || y != other.y;
     }
 };
+
+struct KinematicStatus {
+  MathLib::Vec2 position{ 0.0f, 0.0f };
+  float orientation {0.0f};
+  bool needsToOrientate = true;
+  MathLib::Vec2 velocity{ 0.0f, 0.0f };  //linear velocity
+  float rotation{0.0f};               //angular velocity
+
+  float speed{ 0.0f };
+};
+
 
 
 struct PathPointConnection {
@@ -208,7 +259,7 @@ struct PointNode {
 
 struct Path {
     unsigned int pathFound = false;
-    int index = 0;
+    uint16_t index = 0;
     std::vector<MathLib::Vec2> path;
     bool draw = false;
 };
@@ -227,4 +278,10 @@ struct PathNode{
     }
 };
 
+struct Message {
+    AgentType receiver;
+    uint32_t uid = 0;
+    State next_state;
+    t_coord pos = { -1,-1 };
+};
 #endif

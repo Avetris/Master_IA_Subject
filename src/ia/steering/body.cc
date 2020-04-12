@@ -10,19 +10,6 @@
 #include "engine/defines.h"
 #include "ia/agent.h"
 #include "ia/defines.h"
-#include "ia/movement/kinematic/kinematicarrive.h"
-#include "ia/movement/kinematic/kinematicflee.h"
-#include "ia/movement/kinematic/kinematicseek.h"
-#include "ia/movement/kinematic/kinematicwander.h"
-#include "ia/movement/steering/align.h"
-#include "ia/movement/steering/arrive.h"
-#include "ia/movement/steering/delegated/face.h"
-#include "ia/movement/steering/delegated/lookgoing.h"
-#include "ia/movement/steering/delegated/pursue.h"
-#include "ia/movement/steering/delegated/wander.h"
-#include "ia/movement/steering/flee.h"
-#include "ia/movement/steering/seek.h"
-#include "ia/movement/steering/velocity_matching.h"
 
 BodySteering::BodySteering(const Color color, const Type type) {
   _type = type;
@@ -74,56 +61,6 @@ void BodySteering::setTarget(Agent* target) {
   _target = target;
 }
 
-void BodySteering::setSteering(const SteeringMode mode)
-{
-    if (_movement) {
-        _movement.reset();
-    }
-    _state.needsToOrientate = true;
-    switch (mode) {
-    case SteeringMode::Kinematic_Seek: {
-        _movement = std::make_unique<KinematicSeek>();
-        break; }
-    case SteeringMode::Kinematic_Flee: {
-        _movement = std::make_unique<KinematicFlee>();
-        break; }
-    case SteeringMode::Kinematic_Arrive: {
-        _movement = std::make_unique<KinematicArrive>();
-        break; }
-    case SteeringMode::Kinematic_Wander: {
-        _movement = std::make_unique<KinematicWander>();
-        break; }
-    case SteeringMode::Seek: {
-        _movement = std::make_unique<Seek>();
-        break; }
-    case SteeringMode::Flee: {
-        _movement = std::make_unique<Flee>();
-        break; }
-    case SteeringMode::Arrive: {
-        _movement = std::make_unique<Arrive>();
-        break; }
-    case SteeringMode::Align: {
-        _state.needsToOrientate = false;
-        _movement = std::make_unique<Align>();
-        break; }
-    case SteeringMode::Velocity_Matching: {
-        _movement = std::make_unique<VelocityMatching>();
-        break; }
-    case SteeringMode::Pursue: {
-        _movement = std::make_unique<Pursue>();
-        break; }
-    case SteeringMode::Face: {
-        _movement = std::make_unique<Face>();
-        break; }
-    case SteeringMode::LookGoing: {
-        _movement = std::make_unique<LookGoing>();
-        break; }
-    case SteeringMode::Wander: {
-        _movement = std::make_unique<Wander>();
-        break; }
-    }
-}
-
 void BodySteering::updateAutomatic(const uint32_t dt, const Steering& steering) {
     const float time = dt * 0.001f;             //dt comes in miliseconds
 
@@ -136,8 +73,8 @@ void BodySteering::updateAutomatic(const uint32_t dt, const Steering& steering) 
         _state.rotation += steering.rotation_angular;
     }
 
-    _state.position += steering.velocity_linear * time;
-    _state.orientation += steering.rotation_angular * time;
+    _state.position += _state.velocity * time;
+    _state.orientation += _state.rotation * time;
 
     if (!_isKinematic) keepInSpeed();
     keepInBounds();

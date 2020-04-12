@@ -28,7 +28,7 @@ class Game {
 		void render();
 
 		bool quit_ = false;
-		uint8_t fps_sprite_ = 0;
+		uint16_t fps_sprite_ = 0;
 
 		int8_t slo_mo_ = 1;
 

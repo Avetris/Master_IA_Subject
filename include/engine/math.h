@@ -72,5 +72,4 @@ template <typename T> void swap(T* x, T* y)
     *x = *y;
     *y = temp;
 }
-
 #endif

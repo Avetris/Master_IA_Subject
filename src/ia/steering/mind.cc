@@ -11,10 +11,10 @@
 #include "ia/world.h"
 #include "ia/steering/world.h"
 
-MindSteering::MindSteering(World* world, Body* body)
-  : Mind(world, body) {
+MindSteering::MindSteering(Agent* agent, Body* body)
+  : Mind(agent, body) {
 }
 
 void MindSteering::update(uint32_t dt) {
-  static_cast<BodySteering*>(_body)->setTarget(static_cast<WorldSteering*>(_world)->getTarget());
+  static_cast<BodySteering*>(_body)->setTarget(static_cast<WorldSteering*>(_agent->_world)->getTarget());
 }

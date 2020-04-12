@@ -6,23 +6,26 @@
 #include <cstdio>
 #include <iostream>
 #include <iomanip>
+#include <ia\door.h>
 
 void PathManager::init(MapWorld* world, Zone zones[MAP_L2_WIDTH][MAP_L2_WIDTH], PointNode* pointNodes, uint8_t numPointNodes)
 {
-	Map::loadMap(_costs);
-	for (size_t i = 0; i < MAP_L2_WIDTH; i++) {
-		for (size_t j = 0; j < MAP_L2_HEIGHT; j++) {
-			_zones[i][j] = &zones[i][j];
+	if (!_loopThread.joinable()) {
+		Map::loadMap(_costs);
+		for (size_t i = 0; i < MAP_L2_WIDTH; i++) {
+			for (size_t j = 0; j < MAP_L2_HEIGHT; j++) {
+				_zones[i][j] = &zones[i][j];
+			}
 		}
+		_world = world;
+		_numPointNodes = numPointNodes;
+		_loopThread = std::thread(&PathManager::calculatePath, this, pointNodes);
 	}
-	_world = world;
-	_numPointNodes = numPointNodes;
-	_loopThread = std::thread(&PathManager::calculatePath, this, pointNodes);
 }
 
-void PathManager::addPath(t_coord startPos, t_coord endPos, Mind* target, AgentType agentType, bool draw, PathType type) {
+void PathManager::addPath(t_coord startPos, t_coord endPos, Agent* target, AgentType agentType, bool draw, PathType type) {
 	_mutex.lock();
-	_pathQueue.push(*(new PathFinding(_world, startPos, endPos, target, draw, type, agentType )));
+	_pathQueue.push({ _world, startPos, endPos, target, draw, type, agentType });
 	_mutex.unlock();
 }
 
@@ -70,13 +73,11 @@ void PathManager::calculatePath(PointNode* pointNodes)
 	printPointNodeMatrix();
 	while (true) {
 		if (!_pathQueue.empty()) {
-
+			//std::cout << _pathQueue.size() << std::endl;
 			if (_matrixMade || !_pathQueue.front().isPointPath()) {
 				_pathQueue.front().init(_costs, _pointNodesMatrix, _numPointNodes);
 				_pathQueue.front().findPath();
-				_mutex.lock();
 				_pathQueue.pop();
-				_mutex.unlock();
 			}
 		}
 	}
@@ -106,8 +107,8 @@ void PathManager::calculatePointNodeMatrix(PointNode* pointNodes)
 							if (z1[ii] == z2[jj] && z1[ii] != Zone::Door) {
 								PathFinding pf = {
 									_world,
-									{pointNodes[i].pos.x * 8, pointNodes[i].pos.y * 8},
-									{pointNodes[j].pos.x * 8, pointNodes[j].pos.y * 8},
+									{pointNodes[i].pos.x, pointNodes[i].pos.y},
+									{pointNodes[j].pos.x, pointNodes[j].pos.y},
 									nullptr, 
 									false, 
 									PathType::Dijkstra, 

@@ -1,16 +1,16 @@
-#ifndef __SCENE_PATH_H__
-#define __SCENE_PATH_H__ 1
+#ifndef __SCENE_FINAL_H__
+#define __SCENE_FINAL_H__ 1
 
 #include <engine\scene.h>
-#include <ia\pathfinding\world.h>
+#include <ia\final\world.h>
 #include <ia\pathfinding\path_manager.h>
 
 #include <unordered_map>
 
-class ScenePath: public Scene {
+class SceneFinal: public Scene {
 	public:
-		ScenePath() {};
-		~ScenePath() {};
+		SceneFinal() {};
+		~SceneFinal() {};
 
 		void init() final;
 		void shutdown() final;
@@ -21,15 +21,12 @@ class ScenePath: public Scene {
 		void render() final;
 	private:
 		void initText();
-		void changeType(PathType type);
-		WorldPath _world;
+		WorldFinal _world;
 
-		bool _loaded = false;
 		Sprite _background;
+		bool _loaded = false;
 		t_coord _fristClick = {-1, -1};
-
-		PathType _type = PathType::Dijkstra;
-		std::unordered_map<PathType, uint32_t> _typeSpriteMap;
+		uint32_t _nSoldier = 0, _nSlaves = 0, _nGuards = 0;
 		std::vector<uint32_t> _sprites;
 };
 

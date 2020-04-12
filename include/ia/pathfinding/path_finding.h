@@ -9,7 +9,8 @@
 
 class PathFinding {
   public:
-    PathFinding(MapWorld* world, t_coord startPos, t_coord _goalPos, Mind* target, bool draw, PathType type, AgentType agentType);
+      Agent* _target = nullptr;
+    PathFinding(MapWorld* world, t_coord startPos, t_coord _goalPos, Agent* target, bool draw, PathType type, AgentType agentType);
     ~PathFinding() {
         if (_pointNodesMatrix != nullptr) {
             delete[] _pointNodesMatrix;
@@ -21,6 +22,8 @@ class PathFinding {
     void findPath();
     bool isPointPath() { return _type == PathType::A_Pre_Manhattan; }
     Path getPath() const { return _pathFound; }
+
+    void changeGoal(t_coord pos) { _goalPos = pos; }
   private:
       bool _draw = false;
       PathType _type;
@@ -34,7 +37,6 @@ class PathFinding {
       uint8_t _numPointNodes;
       PathNode* _bestNode = nullptr;
       PathPointConnection* _bestPointNode = nullptr;
-      Mind* _target = nullptr;
       MapWorld* _world = nullptr;
       
       
