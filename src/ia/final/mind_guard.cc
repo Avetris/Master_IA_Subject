@@ -38,7 +38,22 @@ void MindGuard::checkNearSlave()
 {
     if (static_cast<WorldFinal*>(_agent->_world)->isAlarm()) {
         Agent* ag = static_cast<WorldFinal*>(_agent->_world)->isAgentNear(_body->getKinematic()->position, AgentType::Slave, DISTANCE_CHASE);
+        bool found = false;
         if (ag) {
+            t_coord position = {
+                round(ag->getKinematic()->position.x()),
+                round(ag->getKinematic()->position.y())
+            };
+            std::vector<t_coord> zones = static_cast<WorldFinal*>(_agent->_world)->getInterestPositions(Zone::FortressExitZone);
+            std::vector<t_coord> z = static_cast<WorldFinal*>(_agent->_world)->getInterestPositions(Zone::FortressZone);
+            zones.insert(zones.end(), z.begin(), z.end());
+            for (t_coord dp : zones) {
+                if (dp.x == position.x && dp.y== position.y) {
+                    found = true;
+                }
+            }
+        }
+        if (found) {
             _machineState[0] = State::M_Chasing;
             _machineState[1] = State::M_Chasing;
             static_cast<BodyFinal*>(_body)->setTarget(ag);
@@ -94,10 +109,8 @@ void MindGuard::checkPatroling()
                 goal = dp;
             }
         }
+        _machineState[2] = State::M_Finding_Door;
         askForPath(goal, AgentType::Guard);
-
-        _machineState[0] = State::M_Waiting;
-        _machineState[1] = State::M_Finding_Door;
     }
     else if (_pathTarget->index >= _pathTarget->path.size()) {
         findPatrol();
@@ -125,8 +138,7 @@ void MindGuard::checkFindingDoor()
 
 void MindGuard::findPatrol()
 {
-    _machineState[0] = State::M_Waiting;
-    _machineState[1] = State::M_Patroling;
+    _machineState[2] = State::M_Patroling;
     t_coord position = {
            round(_body->getKinematic()->position.x() / 8),
            round(_body->getKinematic()->position.y() / 8)
@@ -146,8 +158,7 @@ void MindGuard::findPatrol()
 
 void MindGuard::findDoor()
 {
-    _machineState[0] = State::M_Waiting;
-    _machineState[1] = State::M_Finding_Door;
+    _machineState[2] = State::M_Finding_Door;
     t_coord position = {
            round(_body->getKinematic()->position.x() / 8),
            round(_body->getKinematic()->position.y() / 8)
@@ -168,11 +179,10 @@ bool MindGuard::receiveMessage()
     for (const Message* msg : messages) {
         if (msg) {
             if (_machineState[0] != State::M_Finding_Door) {
+                _machineState[2] = msg->next_state;
                 if (msg->pos.x != -1 && msg->pos.y != -1) {
                     askForPath(msg->pos, AgentType::Guard);
-                }
-                _machineState[0] = State::M_Waiting;
-                _machineState[1] = msg->next_state;
+                };
             }
         }
     }

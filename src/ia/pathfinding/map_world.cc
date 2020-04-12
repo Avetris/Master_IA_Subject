@@ -163,6 +163,24 @@ void MapWorld::readMap()
                 case Zone::OutdoorZone11:
                 {
                     std::vector<t_coord> vec;
+                    auto it = _interestNodes.find(Zone::OutdoorExitZone);
+                    if (it != _interestNodes.end()) {
+                        vec = it->second;
+                    }
+                    vec.push_back({ j,i });
+                    _interestNodes[Zone::OutdoorExitZone] = vec;
+                }
+                case Zone::OutdoorZone1:
+                case Zone::OutdoorZone2:
+                case Zone::OutdoorZone3:
+                case Zone::OutdoorZone4:
+                case Zone::OutdoorZone6:
+                case Zone::OutdoorZone8:
+                case Zone::OutdoorZone10:
+                case Zone::OutdoorZone12:
+                case Zone::OutdoorZone13:
+                {
+                    std::vector<t_coord> vec;
                     auto it = _interestNodes.find(Zone::OutdoorZone);
                     if (it != _interestNodes.end()) {
                         vec = it->second;

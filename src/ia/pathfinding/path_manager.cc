@@ -74,7 +74,7 @@ void PathManager::calculatePath(PointNode* pointNodes)
 	while (true) {
 		if (!_pathQueue.empty()) {
 			//std::cout << _pathQueue.size() << std::endl;
-			if (_matrixMade || !_pathQueue.front().isPointPath()) {
+			if (_matrixMade || !_pathQueue.front().isPointPath()) {				
 				_pathQueue.front().init(_costs, _pointNodesMatrix, _numPointNodes);
 				_pathQueue.front().findPath();
 				_pathQueue.pop();

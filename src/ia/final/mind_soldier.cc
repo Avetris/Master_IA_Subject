@@ -48,7 +48,7 @@ void MindSoldier::checkWaiting()
             _machineState[0] = _machineState[1];
         }
         else {
-            if (_machineState[1] == State::M_Going_Base) {
+            if (_machineState[1] == State::M_Going_Base || _machineState[2] == State::M_Going_Base) {
                 findBase();
             }
             else {
@@ -76,10 +76,8 @@ void MindSoldier::checkFindingDoor()
                 goal = dp;
             }
         }
+        _machineState[2] = State::M_Action_Door;
         askForPath(goal, AgentType::Soldier);
-
-        _machineState[0] = State::M_Waiting;
-        _machineState[1] = State::M_Action_Door;
     }
     else if (_pathTarget->index >= _pathTarget->path.size()) {
         findDoor();
@@ -130,8 +128,7 @@ void MindSoldier::checkGoingBase()
 
 void MindSoldier::findBase()
 {
-    _machineState[0] = State::M_Waiting;
-    _machineState[1] = State::M_Going_Base;
+    _machineState[2] = State::M_Going_Base;
     std::vector<t_coord> zones = static_cast<WorldFinal*>(_agent->_world)->getInterestPositions(Zone::Base);
     int v = (rand() % zones.size());
     t_coord position = {
@@ -143,14 +140,13 @@ void MindSoldier::findBase()
 
 void MindSoldier::findDoor()
 {
-    _machineState[0] = State::M_Waiting;
-    _machineState[1] = State::M_Finding_Door;
+    _machineState[2] = State::M_Finding_Door;
     t_coord position = {
            round(_body->getKinematic()->position.x() / 8),
            round(_body->getKinematic()->position.y() / 8)
     };
     WorldFinal* w = static_cast<WorldFinal*>(_agent->_world);
-    std::vector<t_coord> zones = static_cast<WorldFinal*>(_agent->_world)->getInterestPositions(Zone::OutdoorZone);
+    std::vector<t_coord> zones = static_cast<WorldFinal*>(_agent->_world)->getInterestPositions(Zone::OutdoorExitZone);
     int v = 0;
     do {
         v = (rand() % zones.size());
@@ -164,9 +160,8 @@ bool MindSoldier::receiveMessage()
     for (const Message* msg : messages) {
         if (msg) {
             if (msg->pos.x != -1 && msg->pos.y != -1) {
+                _machineState[2] = msg->next_state;
                 askForPath(msg->pos, AgentType::Soldier);
-                _machineState[0] = State::B_Waiting;
-                _machineState[0] = msg->next_state;
             }
         }
     }

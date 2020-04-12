@@ -31,6 +31,7 @@ void BodyFinal::update(const uint32_t dt) {
         updateWander(dt);
         break;
     case State::B_Waiting:
+        updateRandom(dt);
         break;
     case State::B_Pathing:
     case State::B_Pathing_Slow:
@@ -66,7 +67,6 @@ void BodyFinal::updatePath(const uint32_t dt) {
 
     if (targetState && targetState->position.x() >= 0 && targetState->position.y() >= 0) {
         Steering steer;
-        //_movement.get()->calculate(_state, targetState, &steer);
         steer.velocity_linear = (targetState->position - _state.position).normalized() * _state.speed;
         updateAutomatic(dt, steer);
     }
@@ -91,6 +91,39 @@ void BodyFinal::updateWander(uint32_t dt)
         for (int i = -1; i <= 1; i++) {
             for (int j = -1; j <= 1; j++) {
                 if ((i != 0 || j != 0) && _world->getZoneMap(pos.x + i, pos.y + j) == Zone::RestZone) {
+                    possibilities.push_back({ i * _state.speed, j * _state.speed });
+                }
+            }
+        }
+        if (possibilities.size() > 0) {
+            int v = (rand() % possibilities.size());
+            steer.velocity_linear = possibilities[v];
+        }
+    }
+    else {
+        steer.velocity_linear = _state.velocity;
+    }
+    updateAutomatic(dt, steer);
+    _sprite.setPosition(_state.position.x(), _state.position.y());
+}
+
+void BodyFinal::updateRandom(uint32_t dt)
+{
+    Steering steer;
+    std::vector<MathLib::Vec2> possibilities;
+
+    t_coord pos = { (int)_state.position.x() / 8, (int)_state.position.y() / 8 };
+    t_coord vel = { (int)_state.velocity.x() / _state.speed, (int)_state.velocity.y() / _state.speed };
+
+    if ((vel.x == 0 && vel.y == 0)
+        || _world->getZoneMap(pos.x + vel.x, pos.y + vel.y) == Zone::Wall
+        || _world->getZoneMap(pos.x + vel.x, pos.y + vel.y) == Zone::Door
+        || rand() % 100 > 90) {
+        for (int i = -1; i <= 1; i++) {
+            for (int j = -1; j <= 1; j++) {
+                if ((i != 0 || j != 0) && 
+                    _world->getZoneMap(pos.x + i, pos.y + j) != Zone::Wall && 
+                    _world->getZoneMap(pos.x + i, pos.y + j) != Zone::Door) {
                     possibilities.push_back({ i * _state.speed, j * _state.speed });
                 }
             }
@@ -160,24 +193,6 @@ void BodyFinal::setTargetPath(Path* path) {
     if (_pathTarget) {
         _pathTarget->index = 0;
         Vec2* coord = &_pathTarget->path[_pathTarget->index];
-
-        t_coord c1 = { round(coord->x() / 8), round(coord->y() / 8) };
-        t_coord c2 = { round(_state.position.x() / 8), round(_state.position.y() / 8) };
-        uint16_t distance = _world->getDistance(c1, c2);
-        if (distance > 10) {
-            for (int i = 0; i < _pathTarget->path.size(); i++) {
-                c1 = { 
-                    (int) round(_pathTarget->path[_pathTarget->index].x() / 8), 
-                    (int) round(_pathTarget->path[_pathTarget->index].y() / 8)
-                };
-                uint16_t d = _world->getDistance(c1, c2);
-                if (d < distance) {
-                    _pathTarget->index = i;
-                }
-            }
-            coord = &_pathTarget->path[_pathTarget->index];
-        }
-        
 
         _pathTarget->index++;
         Vec2* target = &_pathTarget->path[_pathTarget->index];

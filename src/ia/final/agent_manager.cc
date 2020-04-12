@@ -41,12 +41,16 @@ Agent* AgentManager::isAgentNear(MathLib::Vec2 coord, int distance){
         if (sta[0] != State::M_Arrested 
             && sta[1] != State::M_Arrested 
             && sta[1] != State::M_Going_Rest) {
+
             t_coord ac = {
                 round(_agents[i]->getKinematic()->position.x() / 8),
                 round(_agents[i]->getKinematic()->position.y() / 8)
             };
-            if (_world->getDistance(cc, ac) <= distance) {
-                ag = _agents[i];
+            if (_world->getZoneMap(ac.x, ac.y) != Zone::Wall && _world->getZoneMap(ac.x, ac.y) != Zone::Door)
+            {
+                if (_world->getDistance(cc, ac) <= distance) {
+                    ag = _agents[i];
+                }
             }
         }
     }

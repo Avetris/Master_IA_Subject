@@ -6,9 +6,11 @@
 
 class MindFinal: public Mind {
     public:
-        State _machineState[2] = { State::Idle };
+        State _machineState[3] = { State::Idle };
         MindFinal(Agent* agent, Body* body) : Mind(agent, body) {}
-        ~MindFinal() {};
+        ~MindFinal() {
+            while(_waitingPath) {}
+        };
 
         void setTargetPath(Path path) final;
 

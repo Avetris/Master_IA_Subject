@@ -52,12 +52,8 @@ void MindSlave::checkArrested()
         && _machineState[0] != State::M_Arrested && _machineState[1] != State::M_Arrested) {
         Agent* ag = static_cast<WorldFinal*>(_agent->_world)->isAgentNear(_body->getKinematic()->position, AgentType::Guard, 2);
         if (ag) {
-            _machineState[0] = State::M_Waiting;
-            _machineState[1] = State::M_Arrested;
-            _target = { 0,0 };
-            _pathTarget = nullptr;
-            _nextTarget = nullptr;
-            _waitingPath = false;
+            _machineState[2] = State::M_Arrested;
+            goRest();
         }
     }
 }
@@ -162,6 +158,8 @@ void MindSlave::checkGoingBase()
         for (t_coord coord : pos) {
             if (coord == position) {
                 _machineState[0] = State::M_In_Base;
+                _machineState[1] = State::M_In_Base;
+                _machineState[2] = State::M_In_Base;
                 found = true;
                 break;
             }
@@ -260,8 +258,7 @@ void MindSlave::checkGoingRest()
 
 void MindSlave::findBase()
 {
-    _machineState[0] = State::M_Waiting;
-    _machineState[1] = State::M_Going_Base;
+    _machineState[2] = State::M_Going_Base;
     std::vector<t_coord> zones = static_cast<WorldFinal*>(_agent->_world)->getInterestPositions(Zone::Base);
     int v = (rand() % zones.size());
     t_coord position = {
@@ -273,8 +270,7 @@ void MindSlave::findBase()
 
 void MindSlave::findDoor()
 {
-    _machineState[0] = State::M_Waiting;
-    _machineState[1] = State::M_Finding_Door;
+    _machineState[2] = State::M_Finding_Door;
     t_coord position = {
            round(_body->getKinematic()->position.x() / 8),
            round(_body->getKinematic()->position.y() / 8)
@@ -290,8 +286,7 @@ void MindSlave::findDoor()
 
 void MindSlave::goWork()
 {
-    _machineState[0] = State::M_Waiting;
-    _machineState[1] = State::M_Going_Work;
+    _machineState[2] = State::M_Going_Work;
     std::vector<t_coord> zones = static_cast<WorldFinal*>(_agent->_world)->getInterestPositions(Zone::WorkStart);
     int v = (rand() % zones.size());
     askForPath(zones[v], AgentType::Slave);
@@ -299,8 +294,7 @@ void MindSlave::goWork()
 
 void MindSlave::goRest()
 {
-    _machineState[0] = State::M_Waiting;
-    _machineState[1] = _machineState[1] == State::M_Arrested ? State::M_Arrested : State::M_Going_Rest;
+    _machineState[2] = _machineState[2] == State::M_Arrested ? State::M_Arrested : State::M_Going_Rest;
     std::vector<t_coord> zones = static_cast<WorldFinal*>(_agent->_world)->getInterestPositions(Zone::RestSpawn);
     askForPath(zones[0], AgentType::Slave);
 }
@@ -308,15 +302,14 @@ void MindSlave::goRest()
 void MindSlave::work(bool go, int workPos)
 {
     t_coord goal = { -1,-1 };
-    _machineState[0] = State::M_Waiting;
     if (go) {
-        _machineState[1] = State::M_Working;
+        _machineState[2] = State::M_Working;
         std::vector<t_coord> zones = static_cast<WorldFinal*>(_agent->_world)->getInterestPositions(Zone::WorkGoal);
         int v = workPos == -1 ? (rand() % zones.size()) : workPos;
         goal = zones[v];
     }
     else {
-        _machineState[1] = State::M_Working_Back;
+        _machineState[2] = State::M_Working_Back;
         WorldFinal* w = static_cast<WorldFinal*>(_agent->_world);
         std::vector<t_coord> zones = static_cast<WorldFinal*>(_agent->_world)->getInterestPositions(Zone::WorkStart);
         int v = workPos == -1 ? (rand() % zones.size()) : workPos;
@@ -330,13 +323,11 @@ bool MindSlave::receiveMessage()
     std::vector<const Message*> messages = MessageManager::instance().getMessage(AgentType::Slave, _agent->_UID);
     for (const Message* msg : messages) {
         if (msg) {
-            if (_machineState[0] != State::M_Going_Base && _machineState[0] != State::M_In_Base 
-                && _machineState[0] != State::M_Arrested && _machineState[1] != State::M_Arrested) {
+            if (!_escaped && _machineState[0] != State::M_Going_Base && _machineState[0] != State::M_Arrested && _machineState[1] != State::M_Arrested) {
                 _target = msg->pos;
                 _pathTarget = nullptr;
                 _nextTarget = nullptr;
-                _machineState[0] = State::M_Waiting;
-                _machineState[1] = msg->next_state;                
+                _machineState[2] = msg->next_state;                
                 if (msg->next_state == State::M_Going_Base) findBase();
                 else askForPath(_target, AgentType::Slave);
             }

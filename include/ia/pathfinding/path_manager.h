@@ -46,7 +46,6 @@ class PathManager {
     bool _debug = false;
     std::thread _loopThread;
     std::mutex _mutex;
-
 };
 
 #endif

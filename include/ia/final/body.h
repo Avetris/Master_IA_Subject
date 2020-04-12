@@ -26,8 +26,8 @@ public:
     void setTargetPath(Path* path);
 private:
     void updatePath(uint32_t dt);
-    void updateWander(uint32_t dt);
     void updateRandom(uint32_t dt);
+    void updateWander(uint32_t dt);
     void updateAgainsTarget(uint32_t dt);
     void updateAutomatic(uint32_t dt, const Steering& steering);
 

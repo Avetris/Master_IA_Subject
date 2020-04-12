@@ -8,9 +8,15 @@ void MindFinal::setTargetPath(Path path) {
 
 void MindFinal::askForPath(t_coord goal, AgentType type) {
     if (!_waitingPath) {
-        PathManager::instance().addPath({ -1,-1 }, goal, _agent, type, false);
         _waitingPath = true;
+        _pathTarget = nullptr;
+        PathManager::instance().addPath({ -1,-1 }, goal, _agent, type, false);
         _target = { -1,-1 };
+        _machineState[0] = State::M_Waiting;
+        if (_machineState[2] != State::Idle) {
+            _machineState[1] = _machineState[2];
+            _machineState[2] = State::Idle;
+        }
     }
     else {
         _target = goal;

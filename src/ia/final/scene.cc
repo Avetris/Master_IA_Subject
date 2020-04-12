@@ -34,21 +34,21 @@ void SceneFinal::initText() {
     str += " +/- Slaves";
     char* cstr = new char[255];
     strcpy(cstr, str.c_str());
-    _sprites.push_back(UIManager::instance().addText(const_cast<char*>(str.c_str()), 160, y));
+    _sprites.push_back(UIManager::instance().addText(const_cast<char*>(str.c_str()), 200, y));
     str = "";
     for (int j = 0; j < 2; j++) {
         str += std::to_string(i++);
     }
     str += " +/- Guards";
     strcpy(cstr, str.c_str());
-    _sprites.push_back(UIManager::instance().addText(const_cast<char*>(str.c_str()), 330, y));
+    _sprites.push_back(UIManager::instance().addText(const_cast<char*>(str.c_str()), 400, y));
     str = "";
     for (int j = 0; j < 2; j++) {
         str += std::to_string(i++);
     }
     str += " +/- Soldiers";
     strcpy(cstr, str.c_str());
-    _sprites.push_back(UIManager::instance().addText(const_cast<char*>(str.c_str()), 500, y));
+    _sprites.push_back(UIManager::instance().addText(const_cast<char*>(str.c_str()), 600, y));
 
     y -= 20;
     strcpy(cstr, "Slaves 0");

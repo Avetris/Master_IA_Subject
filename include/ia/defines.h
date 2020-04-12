@@ -61,6 +61,7 @@ enum class Zone {
     DoorOutPoint,
     RestZone = 255000,
     OutdoorZone,
+    OutdoorExitZone,
     OutdoorZone1 = 255,
     OutdoorZone2 = 240,
     OutdoorZone3 = 230,

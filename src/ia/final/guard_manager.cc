@@ -26,6 +26,19 @@ void GuardManager::receiveMessage() {
 }
 
 void GuardManager::takeDecission() {
+    std::vector<t_coord> coords = _world->getInterestPositions(Zone::DoorInPoint);
+    size_t pos = 0;
+    for (Agent* ag : _agents) {
+        if (rand() > RAND_MAX / 2 && pos < coords.size()) {
+            MessageManager::instance().addMessage({
+                AgentType::Guard,
+                ag->_UID,
+                State::M_Finding_Door,
+                coords[pos]
+                });
+            pos++;
+        }
+    }
 }
 
 void GuardManager::takeAlarmDecission() {
