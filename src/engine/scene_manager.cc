@@ -10,12 +10,13 @@
 #include "ia/steering/scene.h"
 #include "ia/pathfinding/scene.h"
 #include "ia/final/scene.h"
+#include "ia/flocking/scene.h"
 
 void SceneManager::createScenes() {
   _scenes[0] = new SceneSteering();
   _scenes[1] = new ScenePath();
   _scenes[2] = new SceneFinal();
-  //_scenes[3] = new SceneSteering();
+  _scenes[3] = new SceneFlocking();
   nextScene(2);
 }
 

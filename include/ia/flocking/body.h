@@ -1,28 +1,56 @@
 
-#ifndef __FLOCKING_BODY_H__
-#define __FLOCKING_BODY_H__ 1
+#ifndef __BODY_FLOCKING_H__
+#define __BODY_FLOCKING_H__ 1
 
+#include "engine/sprite.h"
 #include <ia\body.h>
+#include "ia/defines.h"
+#include "mathlib/vec2.h"
 #include <ia\flocking\alignment.h>
+#include <ia\flocking\cohesion.h>
+#include <ia\flocking\separation.h>
 
-class FlockingBody : public Body {
+class Agent;
+
+class BodyFlocking : public Body {
   public:
-    FlockingBody() {};
-    ~FlockingBody() {};
+      BodyFlocking(Agent* agent, const Color color);
+    ~BodyFlocking() {};
 
-    void init(uint16_t UID, Color color, Type type, MathLib::Vec2 position);
     void update(uint32_t dt);
+    void render() const;
 
-    void setAlignment(Alignment* alignment) { _alignment = alignment; };
-    void setCohesion(Alignment* alignment) { _alignment = alignment; };
-    void setSeparation(Alignment* alignment) { _alignment = alignment; };
+    void setTarget(Agent* target);
   private:
-      Alignment* _alignment = nullptr;
+      void updateAutomatic(uint32_t dt, const Steering& steering);
+      void updateManual(uint32_t dt);
+      void setOrientation(const MathLib::Vec2& velocity);
+      void keepInSpeed();
+      void keepInBounds();
 
-      float _seek_percent = 1.0f;
-      float _alignment_percent = 0.4f;
-      float _cohesion_percent = 0.05f;
-      float _separation_percent = 0.05f;
+      Agent* _agent;
+
+      Alignment _alignment;
+      Cohesion _cohesion;
+      Separation _separation;
+
+      const float _seek_percent = 0.5f;
+      const float _alignment_percent = 0.2f;
+      const float _cohesion_percent = 0.1f;
+      const float _separation_percent = 0.2f;
+
+      Sprite _sprite;
+      Color _color;
+      Agent* _target;
+
+      const float _max_speed = 100.0f;
+
+      struct {
+          struct {
+              MathLib::Vec2 pos;
+              MathLib::Vec2 v;
+          } green, red, blue;
+      } dd;
 };
 
 #endif

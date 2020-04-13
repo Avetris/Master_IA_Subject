@@ -1,57 +1,64 @@
-#include "ia/scene_opt.h"
-#include <ia\world_path.h>
+#include <ia\flocking\scene.h>
+#include <ia\flocking\world.h>
 
 #include <cstdio>
 #include <engine\ui_manager.h>
 
-void SceneOPT::init() {
-  printf("Path Scene Is Being Initialized\n");
+void SceneFlocking::init() {
+  printf("Flocking Scene Is Being Initialized\n");
   const uint32_t y = WINDOW_HEIGHT - 30;
   _addAgent = UIManager::instance().addText("1 Add Agent", 10, y);
   _removeAgent = UIManager::instance().addText("2 Remove Agent", 200, y);
-  std::string text = "Nº Agents: ";
-  text += world_.getNumAgent();
-  _numAgents = UIManager::instance().addText(const_cast<char*>(text.c_str()), 500, y);
+  char text[255];
+  uint8_t num = _world.getNumAgent();
+  sprintf_s(text, "Nº Agents: %i", static_cast<uint8_t>(num));
+  _numAgents = UIManager::instance().addText(text, 500, y);
+
+  if (num <= 1) {
+      UIManager::instance().setColor(_removeAgent, SDL_Color SHADOW_COLOR);
+  }
+  else {
+      UIManager::instance().setColor(_removeAgent, SDL_Color FOREGROUND_COLOR);
+  }
 }
 
-void SceneOPT::shutdown() {
-  printf("OPT Scene Has Been Shutdown\n");
+void SceneFlocking::shutdown() {
+  printf("Flocking Scene Has Been Shutdown\n");
 }
 
-void SceneOPT::update(const uint32_t dt) {
-    world_.update(dt);
+void SceneFlocking::update(const uint32_t dt) {
+    _world.update(dt);
 }
 
-void SceneOPT::handleMouseEvent(const SDL_Event e) {
+void SceneFlocking::handleMouseEvent(SDL_Event e, int x, int y) {
     if (e.type == SDL_MOUSEBUTTONUP) {
-        int x, y;
         SDL_GetMouseState(&x, &y);
-        world_.flocking()->setTarget({ (float)x, (float)y });
+        _world.setTarget({ (float)x, (float)y });
     }
 }
 
-void SceneOPT::handleKeyEvent(const SDL_Keycode key) {
+void SceneFlocking::handleKeyEvent(const SDL_Keycode key) {
   switch (key) {
     case SDLK_1:
-        world_.addAgent();
+        _world.addAgent();
       break;
     case SDLK_2:
-        world_.removeAgent();
+        _world.removeAgent();
         break;
     default:{}
   }
-  std::string text = "Nº Agents: ";
-  int num = world_.getNumAgent();
-  text += num;
-  UIManager::instance().setText(const_cast<char*>(text.c_str()), _numAgents);
+  char text[255];
+  uint8_t num = _world.getNumAgent();
+  sprintf_s(text, "Nº Agents: %i", static_cast<uint8_t>(num));
+  UIManager::instance().setText(text, _numAgents);
   if (num <= 1) {
-      UIManager::instance().setColor(_addAgent, SDL_Color SHADOW_COLOR);
+      UIManager::instance().setColor(_removeAgent, SDL_Color SHADOW_COLOR);
   }
   else {
-      UIManager::instance().setColor(_addAgent, SDL_Color FOREGROUND_COLOR);
+      UIManager::instance().setColor(_removeAgent, SDL_Color FOREGROUND_COLOR);
   }
 }
 
-void SceneOPT::render() {
-    world_.render();
+void SceneFlocking::render() {
+    _world.render();
 }

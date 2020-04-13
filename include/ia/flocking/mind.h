@@ -1,29 +1,20 @@
-#ifndef __FLOCKING_MIND_H__
-#define __FLOCKING_MIND_H__ 1
+#ifndef __MIND_FLOCKING_H__
+#define __MIND_FLOCKING_H__ 1
 
 #include <ia\mind.h>
 #include <ia\flocking\alignment.h>
+#include <ia\flocking\cohesion.h>
+#include <ia\flocking\separation.h>
 
-class FlockingBody;
+
 class World;
 
-class FlockingMind: public Mind {
+class MindFlocking: public Mind {
     public:
-        FlockingMind() {};
-        ~FlockingMind() {};
+        MindFlocking(Agent* agent, Body* body);
+        ~MindFlocking() {};
 
-        void update(uint32_t dt, std::vector<const KinematicStatus*> around){
-            _alignment.calculate(*body_->getKinematic(), around);
-
-            /*   _alignment.calculate(*body_->getKinematic(), around);
-               _alignment.calculate(*body_->getKinematic(), around);*/
-
-            static_cast<FlockingBody*>(body_)->setAlignment(&_alignment);
-            /* body->setCohesion(&_alignment);
-             body->setSeparation(&_alignment);*/
-        }
-    private:
-        Alignment _alignment;
+        void update(uint32_t dt);
 };
 
 #endif

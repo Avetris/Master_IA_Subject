@@ -24,6 +24,6 @@
 #define FPS_FONT_SIZE 30 //12
 #define FPS_FONT_POINT_SIZE 12
 
-#define SCENE_NUMBER 3
+#define SCENE_NUMBER 4
 
 #endif

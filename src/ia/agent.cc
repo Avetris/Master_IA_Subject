@@ -16,6 +16,8 @@
 #include <ia\final\mind_guard.h>
 #include <ia\final\mind_soldier.h>
 #include <ia\final\body.h>
+#include <ia\flocking\body.h>
+#include <ia\flocking\mind.h>
 
 uint32_t Agent::_GUID = 1;
 
@@ -26,6 +28,7 @@ Agent::Agent(World* world, const Color color, const Type type, BodyType bodyType
   case BodyType::Steering: _body = std::make_unique<BodySteering>(color, type); break;
     case BodyType::Pathfinding: _body = std::make_unique<BodyPathFinding>(color); break;
     case BodyType::Final: _body = std::make_unique<BodyFinal>(world, color); break;
+    case BodyType::Flocking: _body = std::make_unique<BodyFlocking>(this, color); break;
   }
 
   switch (mindType) {
@@ -34,6 +37,7 @@ Agent::Agent(World* world, const Color color, const Type type, BodyType bodyType
     case MindType::Slave: _mind = std::make_unique<MindSlave>(this, _body.get()); break;
     case MindType::Guard: _mind = std::make_unique<MindGuard>(this, _body.get()); break;
     case MindType::Soldier: _mind = std::make_unique<MindSoldier>(this, _body.get()); break;
+    case MindType::Flocking: _mind = std::make_unique<MindFlocking>(this, _body.get()); break;
   }
   if (position.x() != -1 && position.y() != -1) {
       _body->getKinematic()->position = position;

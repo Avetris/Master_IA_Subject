@@ -1,6 +1,6 @@
 
-#ifndef __WORLD_OPT_H__
-#define __WORLD_OPT_H__ 1
+#ifndef __WORLD_FLOCKING_H__
+#define __WORLD_FLOCKING_H__ 1
 
 #include "ia/world.h"
 #include "ia/agent.h"
@@ -8,27 +8,47 @@
 #include "mathlib/vec2.h"
 #include <ia\flocking\flocking_manager.h>
 
-class WorldOPT: public World {
+class WorldFlocking: public World {
   public:
-      WorldOPT() {
+      WorldFlocking() {
           _flockingManager.init(this);
+          _target = {
+            this,
+            Color::Red,
+            Type::Manual,
+            BodyType::Steering,
+            MindType::Steering,
+            {0.0f,0.0f}
+          };
     };
-    ~WorldOPT() {
+    ~WorldFlocking() {
         _flockingManager.shutdown();
     };
 
-    void update(const float dt) { 
+    void update(uint32_t dt) {
+        _target.update(dt);
         _flockingManager.update(dt);
     }
-    void render() const { _flockingManager.render(); }
+    void render() const {
+        _target.render(); 
+        _flockingManager.render(); 
+    }
 
     void addAgent() { _flockingManager.addAgent(); }
     void removeAgent() { _flockingManager.removeAgent(); }
-    int getNumAgent() { return _flockingManager.getNumAgents(); }
+    uint8_t getNumAgent() { return _flockingManager.getNumAgents(); }
 
+    void setTarget(MathLib::Vec2 target) {
+        _target.getKinematic()->position = target;
+    }
+
+    Agent* getTarget() {
+        return &_target;
+    }
     FlockingManager* flocking() { return &_flockingManager; }
   private:
     FlockingManager _flockingManager;
+    Agent _target;
 };
 
 #endif

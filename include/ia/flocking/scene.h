@@ -1,26 +1,23 @@
-#ifndef __SCENE_OPT_H__
-#define __SCENE_OPT_H__ 1
+#ifndef __SCENE_FLOCKING_H__
+#define __SCENE_FLOCKING_H__ 1
 
 #include <engine\scene.h>
-#include <ia\world_path.h>
+#include <ia\flocking\world.h>
 
-#include <unordered_map>
-#include <ia\world_opt.h>
-
-class SceneOPT : public Scene {
+class SceneFlocking : public Scene {
 	public:
-		SceneOPT() {};
-		~SceneOPT() {};
+		SceneFlocking() {};
+		~SceneFlocking() {};
 
 		void init() final;
 		void shutdown() final;
 
 		void update(uint32_t dt) final;
-		void handleMouseEvent(SDL_Event e) final;
+		void handleMouseEvent(SDL_Event e, int x, int y) final;
 		void handleKeyEvent(SDL_Keycode key) final;
 		void render() final;
 	private:
-		WorldOPT world_;
+		WorldFlocking _world;
 
 		uint16_t _addAgent, _removeAgent, _numAgents;
 

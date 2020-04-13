@@ -1,40 +1,26 @@
-//----------------------------------------------------------------------------
-//                                                        _   ________  __
-//  Copyright VIU 2020                                   | | / /  _/ / / /
-//  Author: Ivan Fuertes <ivan.fuertes@campusviu.es>     | |/ // // /_/ /
-//                                                       |___/___/\____/
-//----------------------------------------------------------------------------
+#ifndef __COHESION_H__
+#define __COHESION_H__ 1
 
-#ifndef __ALIGN_H__
-#define __ALIGN_H__ 1
+#include <vector>
+#include <ia/movement/kinematic/kinematicseek.h>
 
-#include "ia/movement/movement.h"
+class Cohesion {
+public:
+    Cohesion() {}
+    virtual ~Cohesion() {}
 
-class Align : public Movement {
-  public:
-    Align() {}
-    virtual ~Align() {}
-
-    virtual void calculate(const KinematicStatus& character, const KinematicStatus* target, Steering* steering) override {
-      //rotation between character and target wrapped to (-PI, PI)
-      const float rotation = wrapAnglePI(target->orientation - character.orientation);
-      const float rotation_size = abs(rotation);     //absolute value of rotation
-
-      float target_rotation = max_rotation_;         //max
-      if (rotation_size < slow_radius_) {            //inside the slow zone
-        //speed of rotation slowing down
-        target_rotation = (max_rotation_ * rotation_size) / slow_radius_;
-      }
-
-      target_rotation *= sign(rotation);      //positive or negative
-      //angular acceleration adjusted to time
-      steering->rotation_angular = (target_rotation - character.rotation) / time_to_target_;
-      if (abs(steering->rotation_angular) > max_ang_acc_) {   //too fast
-        //normalized to max
-        steering->rotation_angular = sign(steering->rotation_angular) * max_ang_acc_;
-      }
-
-      steering->velocity_linear = MathLib::Vec2(0.0f, 0.0f);     //no linear
+    Steering calculate(const KinematicStatus& character, const std::vector<const KinematicStatus*> flocking) {
+        Steering steering;
+        if (flocking.size() > 0) {
+            KinematicStatus status;
+            for (const KinematicStatus* kinematic : flocking) {
+                status.position.addEq(kinematic->position);
+            }
+            status.position.divEq(flocking.size());
+            KinematicSeek seek;
+            seek.calculate(character, &status, &steering);
+        }
+        return steering;
     }
 };
 #endif
